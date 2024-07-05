@@ -34,4 +34,12 @@ public abstract class Messager {
     private String energyRegeneration;
     private String bloodRegeneration;
     private String level;
+
+    private String inventory_menu;
+    private String craftingIngredients;
+    private String items;
+    private String artifacts;
+
+    private String inventoryIsEmpty;
+    private String yourInventory;
 }

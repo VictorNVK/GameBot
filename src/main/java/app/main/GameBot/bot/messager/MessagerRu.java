@@ -37,4 +37,11 @@ public class MessagerRu extends Messager {
     private final String bloodRegeneration = "Регенерация крови: ";
     private final String level = "Уровень: ";
 
+    private final String inventory_menu = "Выберите пункт меню инвенторя: ";
+    private final String craftingIngredients = "Ингридиенты для крафта\uD83C\uDF43";
+    private final String items = "Предметы\uD83E\uDDF3";
+    private final String artifacts = "Артефакты✨";
+    private final String inventoryIsEmpty = "Нет ингридиентов для крафта❌";
+    private final String yourInventory = "Ваши ингриенты для крафта :\n\n";
+
 }

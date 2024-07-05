@@ -34,7 +34,7 @@ public class GameBot extends TelegramLongPollingBot {
     private final MenuHandler menuHandler;
     private final PlayerHandler playerHandler;
     private final PlayerRepository playerRepository;
-    private final ItemRepository inventoryRepository;
+    private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final Logger logger;
 
@@ -50,7 +50,7 @@ public class GameBot extends TelegramLongPollingBot {
         this.menuHandler = menuHandler;
         this.playerHandler = playerHandler;
         this.playerRepository = playerRepository;
-        this.inventoryRepository = inventoryRepository;
+        this.itemRepository = inventoryRepository;
         this.userRepository = userRepository;
         this.logger = logger;
     }
@@ -152,9 +152,24 @@ public class GameBot extends TelegramLongPollingBot {
                 return;
             }
             if (callback.startsWith("inventory")) {
+                execute(inventoryHandler.inventory_menu(chatId, user.getLanguage()));
                 logger.log(player.getNickname(), user.getId(), "выбрал пукт меню",
                         "инвентарь");
 
+            }
+            if(callback.startsWith("items")){
+                execute(menuHandler.in_dev(chatId, user.getLanguage()));
+                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню инвенторя",
+                        "Предметы");
+            }
+            if(callback.startsWith("ingredients")){
+                var items = itemRepository.findItemsByPlayer(player);
+                execute(inventoryHandler.ingredients(chatId, user.getLanguage(), items));
+            }
+            if(callback.startsWith("artifacts")){
+                execute(menuHandler.in_dev(chatId, user.getLanguage()));
+                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню инвенторя",
+                        "Артефакты");
             }
             if (callback.startsWith("action")) {
                 logger.log(player.getNickname(), user.getId(), "выбрал пукт меню",
