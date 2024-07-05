@@ -28,4 +28,18 @@ public class MenuKeyboard {
         keyboardMarkup.setKeyboard(rows);
         return keyboardMarkup;
     }
+    public InlineKeyboardMarkup use_tg_name(String text){
+        var keyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+
+        List<InlineKeyboardButton> row1 = new ArrayList<>();
+        var button1 = new InlineKeyboardButton();
+        button1.setText(text);
+        button1.setCallbackData("use-tg-name");
+        row1.add(button1);
+        rows.add(row1);
+        keyboardMarkup.setKeyboard(rows);
+        return keyboardMarkup;
+    }
+
 }

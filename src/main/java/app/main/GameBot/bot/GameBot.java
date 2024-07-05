@@ -5,8 +5,13 @@ import app.main.GameBot.bot.handler.InventoryHandler;
 import app.main.GameBot.bot.handler.LocationHandler;
 import app.main.GameBot.bot.handler.MenuHandler;
 import app.main.GameBot.bot.handler.PlayerHandler;
+import app.main.GameBot.models.Player;
 import app.main.GameBot.models.User;
+import app.main.GameBot.other.Logger;
+import app.main.GameBot.repositories.InventoryRepository;
+import app.main.GameBot.repositories.PlayerRepository;
 import app.main.GameBot.repositories.UserRepository;
+import app.main.GameBot.states.UserState;
 import lombok.SneakyThrows;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -17,8 +22,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 /*Главный метод бота. Здесь обрабатываются все обновления от клиента, после чего вызываются нужные хендлеры
-* для дальнейшей обработки и обновления*/
+ * для дальнейшей обработки и обновления*/
 @Component
 public class GameBot extends TelegramLongPollingBot {
 
@@ -28,26 +34,32 @@ public class GameBot extends TelegramLongPollingBot {
     private final LocationHandler locationHandler;
     private final MenuHandler menuHandler;
     private final PlayerHandler playerHandler;
+    private final PlayerRepository playerRepository;
+    private final InventoryRepository inventoryRepository;
+    private final Logger logger;
 
     private List<User> users = new ArrayList<>();
     private Map<Long, User> userMap = new HashMap<>();
 
     public GameBot(BotConfig botConfig, UserRepository userRepository, InventoryHandler inventoryHandler,
-                    LocationHandler locationHandler, MenuHandler menuHandler,
-                   PlayerHandler playerHandler) {
+                   LocationHandler locationHandler, MenuHandler menuHandler,
+                   PlayerHandler playerHandler, PlayerRepository playerRepository, InventoryRepository inventoryRepository, Logger logger) {
         this.botConfig = botConfig;
         this.userRepository = userRepository;
         this.inventoryHandler = inventoryHandler;
         this.locationHandler = locationHandler;
         this.menuHandler = menuHandler;
         this.playerHandler = playerHandler;
+        this.playerRepository = playerRepository;
+        this.inventoryRepository = inventoryRepository;
+        this.logger = logger;
     }
 
     @Override
     @Async
     public void onUpdateReceived(Update update) {
+        User user;
         if (update.hasMessage() && update.getMessage().hasText()) {
-            User user;
             if (userMap.containsKey(update.getMessage().getChatId())) {
                 user = userMap.get(update.getMessage().getChatId());
             } else {
@@ -62,23 +74,71 @@ public class GameBot extends TelegramLongPollingBot {
             }
             commandHandler(update, user);
         } else if (update.hasCallbackQuery()) {
-            callbackHandler(update);
+            if (userMap.containsKey(update.getCallbackQuery().getFrom().getId())) {
+                user = userMap.get(update.getCallbackQuery().getFrom().getId());
+            } else {
+                user = userRepository.findUserByChatId(update.getCallbackQuery().getFrom().getId());
+                if (user == null) {
+                    user = new User();
+                    user.setChatId(update.getCallbackQuery().getFrom().getId());
+                    userRepository.save(user);
+                }
+                users.add(user);
+                userMap.put(update.getCallbackQuery().getFrom().getId(), user);
+            }
+            callbackHandler(update, user);
         }
     }
 
     @Async
     @SneakyThrows
-    protected void commandHandler(Update update, User user){
+    protected void commandHandler(Update update, User user) {
         var chatId = update.getMessage().getChat().getId();
         var command = update.getMessage().getText();
-        if(command.startsWith("/start")){
+        if (command.startsWith("/start")) {
             execute(menuHandler.start(chatId, user.getLanguage()));
+            user.setUserState(UserState.MENU);
+            updateUser(user);
+            return;
+        }
+        if (user.getUserState().equals(UserState.MENU)) {
+
+        }
+
+        if(user.getUserState().equals(UserState.GET_NAME)){
+            var nickname = command;
+            Player player = playerHandler.create_player(nickname, user);
+            playerRepository.save(player);
+            logger.log(nickname, player.getId(), "зарегистрировался", null);
+            user.setUserState(UserState.MENU);
+            updateUser(user);
+            execute(menuHandler.greeting(chatId, user.getLanguage(), player.getNickname()));
         }
     }
 
     @Async
-    protected void callbackHandler(Update update){
-
+    @SneakyThrows
+    protected void callbackHandler(Update update, User user) {
+        var callback = update.getCallbackQuery().getData();
+        var chatId = update.getCallbackQuery().getFrom().getId();
+        if (user.getUserState().equals(UserState.MENU)) {
+            if (callback.startsWith("lang")) {
+                callback = callback.substring(5);
+                user.setLanguage(callback);
+                user.setUserState(UserState.GET_NAME);
+                updateUser(user);
+                execute(menuHandler.get_name(chatId, user.getLanguage()));
+                return;
+            }
+        }if(user.getUserState().equals(UserState.GET_NAME)){
+            var nickname = update.getCallbackQuery().getFrom().getUserName();
+            Player player = playerHandler.create_player(nickname, user);
+            playerRepository.save(player);
+            logger.log(nickname, player.getId(), "зарегистрировался", null);
+            user.setUserState(UserState.MENU);
+            updateUser(user);
+            execute(menuHandler.greeting(chatId, user.getLanguage(), player.getNickname()));
+        }
     }
 
     @Override
@@ -91,7 +151,7 @@ public class GameBot extends TelegramLongPollingBot {
         return botConfig.getBOT_TOKEN();
     }
 
-    private void updateUser(User user){
+    private void updateUser(User user) {
         userRepository.save(user);
         userMap.put(user.getChatId(), user);
     }
