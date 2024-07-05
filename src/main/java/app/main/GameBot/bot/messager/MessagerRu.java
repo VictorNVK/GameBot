@@ -25,4 +25,16 @@ public class MessagerRu extends Messager {
     private final String characteristics = "Харрактеристики";
     private final String talents = "Таланты(В разработке\uD83D\uDEE0)";
     private final String back = "Назад❌";
+    private final String inDev = "Эта функция находиться в разработке\uD83D\uDEE0";
+
+    private final String health = "Здоровье: ";
+    private final String energy = "Энергий: ";
+    private final String blood = "Кровь: ";
+    private final String attack ="Атака: ";
+    private final String defense= "Защита: ";
+    private final String healthRegeneration = "Регенерация HP: ";
+    private final String energyRegeneration = "Регенерация энергии: ";
+    private final String bloodRegeneration = "Регенерация крови: ";
+    private final String level = "Уровень: ";
+
 }

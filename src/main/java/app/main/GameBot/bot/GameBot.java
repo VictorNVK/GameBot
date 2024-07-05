@@ -29,29 +29,29 @@ import java.util.Map;
 public class GameBot extends TelegramLongPollingBot {
 
     private final BotConfig botConfig;
-    private final UserRepository userRepository;
     private final InventoryHandler inventoryHandler;
     private final LocationHandler locationHandler;
     private final MenuHandler menuHandler;
     private final PlayerHandler playerHandler;
     private final PlayerRepository playerRepository;
     private final ItemRepository inventoryRepository;
+    private final UserRepository userRepository;
     private final Logger logger;
 
     private List<User> users = new ArrayList<>();
     private Map<Long, User> userMap = new HashMap<>();
 
-    public GameBot(BotConfig botConfig, UserRepository userRepository, InventoryHandler inventoryHandler,
+    public GameBot(BotConfig botConfig, InventoryHandler inventoryHandler,
                    LocationHandler locationHandler, MenuHandler menuHandler,
-                   PlayerHandler playerHandler, PlayerRepository playerRepository, ItemRepository inventoryRepository, Logger logger) {
+                   PlayerHandler playerHandler, PlayerRepository playerRepository, ItemRepository inventoryRepository, UserRepository userRepository, Logger logger) {
         this.botConfig = botConfig;
-        this.userRepository = userRepository;
         this.inventoryHandler = inventoryHandler;
         this.locationHandler = locationHandler;
         this.menuHandler = menuHandler;
         this.playerHandler = playerHandler;
         this.playerRepository = playerRepository;
         this.inventoryRepository = inventoryRepository;
+        this.userRepository = userRepository;
         this.logger = logger;
     }
 
@@ -116,8 +116,10 @@ public class GameBot extends TelegramLongPollingBot {
     @Async
     @SneakyThrows
     protected void callbackHandler(Update update, User user) {
+
         var callback = update.getCallbackQuery().getData();
         var chatId = update.getCallbackQuery().getFrom().getId();
+
         if (user.getUserState() == null) {
             if (callback.startsWith("lang")) {
                 callback = callback.substring(5);
@@ -128,24 +130,39 @@ public class GameBot extends TelegramLongPollingBot {
                 return;
             }
         }
+        Player player = playerRepository.findPlayerById(user.getId());
+
         if (user.getUserState().equals(UserState.MENU)) {
-            if (callback.startsWith("character")) {
+            if (callback.equals("character")) {
                 execute(playerHandler.character_menu(chatId, user.getLanguage()));
+                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню",
+                        "персонаж");
                 return;
             }
             if(callback.startsWith("characteristics")){
-
+                execute(playerHandler.sendCharacteristics(chatId, user.getLanguage(), player));
+                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню персонажа",
+                        "харрактеристика");
+                return;
             }
             if (callback.startsWith("talents")){
-
+                execute(menuHandler.in_dev(chatId, user.getLanguage()));
+                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню персонажа",
+                        "таланты");
+                return;
             }
             if (callback.startsWith("inventory")) {
+                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню",
+                        "инвентарь");
 
             }
             if (callback.startsWith("action")) {
-
+                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню",
+                        "действие в локации");
             }
             if (callback.startsWith("changeLocation")) {
+                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню",
+                        "сменить локацию");
 
             }
 
@@ -156,12 +173,12 @@ public class GameBot extends TelegramLongPollingBot {
         }
         if (user.getUserState().equals(UserState.GET_NAME)) {
             var nickname = update.getCallbackQuery().getFrom().getUserName();
-            Player player = playerHandler.create_player(nickname, user);
-            playerRepository.save(player);
-            logger.log(nickname, player.getId(), "зарегистрировался", null);
+            Player newPlayer = playerHandler.create_player(nickname, user);
+            playerRepository.save(newPlayer);
+            logger.log(nickname, newPlayer.getId(), "зарегистрировался", null);
             user.setUserState(UserState.MENU);
             updateUser(user);
-            execute(menuHandler.greeting(chatId, user.getLanguage(), player.getNickname()));
+            execute(menuHandler.greeting(chatId, user.getLanguage(), newPlayer.getNickname()));
             execute(menuHandler.menu(chatId, user.getLanguage()));
             return;
         }

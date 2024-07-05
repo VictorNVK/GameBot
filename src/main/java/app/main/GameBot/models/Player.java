@@ -17,15 +17,10 @@ import lombok.Setter;
 public class Player {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column
     private String nickname;
-
-    @JoinColumn(name = "client_id")
-    @ManyToOne
-    private User owner;
 
     @Enumerated
     private Location location;

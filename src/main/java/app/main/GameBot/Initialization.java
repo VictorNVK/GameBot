@@ -24,7 +24,6 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 public class Initialization {
 
     private final BotConfig botConfig;
-    private final UserRepository userRepository;
     private final InventoryHandler inventoryHandler;
     private final LocationHandler locationHandler;
     private final MenuHandler menuHandler;
@@ -32,13 +31,14 @@ public class Initialization {
     private final PlayerRepository playerRepository;
     private final ItemRepository inventoryRepository;
     private final Logger logger;
+    private final UserRepository userRepository;
 
     @EventListener(ContextRefreshedEvent.class)
     public void init() {
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot(new GameBot(botConfig, userRepository, inventoryHandler, locationHandler, menuHandler
-                    ,playerHandler, playerRepository, inventoryRepository, logger));
+            botsApi.registerBot(new GameBot(botConfig, inventoryHandler, locationHandler, menuHandler
+                    ,playerHandler, playerRepository, inventoryRepository, userRepository, logger));
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

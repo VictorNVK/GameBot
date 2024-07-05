@@ -1,13 +1,12 @@
 package app.main.GameBot.bot.handler;
 
-import app.main.GameBot.bot.keyboard.Keyboard;
-import app.main.GameBot.bot.keyboard.MenuKeyboard;
 import app.main.GameBot.bot.keyboard.PlayerKeyboard;
 import app.main.GameBot.bot.messager.Messager;
 import app.main.GameBot.bot.messager.MessagerEn;
 import app.main.GameBot.bot.messager.MessagerRu;
 import app.main.GameBot.models.Player;
 import app.main.GameBot.models.User;
+import app.main.GameBot.states.Location;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -28,8 +27,8 @@ public class PlayerHandler {
     }
 
     public Player create_player(String name, User user){
-        Player player = new Player();
-        player.setOwner(user);
+        var player = new Player();
+        player.setId(user.getId());
         player.setNickname(name);
         player.setLevel(1);
         player.setHealth(20);
@@ -40,7 +39,7 @@ public class PlayerHandler {
         player.setHealthRegeneration(1);
         player.setEnergyRegeneration(1);
         player.setBloodRegeneration(1);
-
+        player.setLocation(Location.GLADE);
         return player;
     }
 
@@ -50,6 +49,24 @@ public class PlayerHandler {
         sendMessage.setText(messager.getCharacterMenu());
         sendMessage.setChatId(chatId);
         sendMessage.setReplyMarkup(playerKeyboard.character_menu(lang));
+        return sendMessage;
+    }
+    public SendMessage sendCharacteristics(Long chatId, String lang, Player player){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getCharacteristics() +
+                "\n\n"
+                + messager.getLevel() + player.getLevel() + "\uD83C\uDF1F"
+                +"\n"+ messager.getHealth() + player.getHealth() + "♥\uFE0F"
+        +"\n" +messager.getEnergy() + player.getEnergy() + "⚡\uFE0F"
+        +"\n" + messager.getBlood() + player.getBlood() + "\uD83E\uDE78"
+                +"\n" + messager.getAttack() + player.getAttack() + "\uD83D\uDDE1"
+        +"\n" +messager.getDefense() + player.getDefense() + "\uD83D\uDEE1"
+        +"\n" + messager.getHealthRegeneration() + player.getHealthRegeneration()
+        +"\n" + messager.getEnergyRegeneration() + player.getEnergyRegeneration()
+        +"\n" + messager.getBloodRegeneration() + player.getBloodRegeneration());
+
         return sendMessage;
     }
 }

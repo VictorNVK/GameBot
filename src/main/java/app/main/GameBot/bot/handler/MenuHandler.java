@@ -58,4 +58,12 @@ public class MenuHandler {
         sendMessage.setReplyMarkup(menuKeyboard.menu(lang));
         return sendMessage;
     }
+
+    public SendMessage in_dev(Long chatId, String lang){
+        choose_lang(lang);
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getInDev());
+        return sendMessage;
+    }
 }

@@ -23,4 +23,15 @@ public abstract class Messager {
     private String characteristics;
     private String talents;
     private String back;
+    private String inDev;
+
+    private String health;
+    private String energy;
+    private String blood;
+    private String attack;
+    private String defense;
+    private String healthRegeneration;
+    private String energyRegeneration;
+    private String bloodRegeneration;
+    private String level;
 }
