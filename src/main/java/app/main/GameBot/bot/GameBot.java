@@ -8,7 +8,7 @@ import app.main.GameBot.bot.handler.PlayerHandler;
 import app.main.GameBot.models.Player;
 import app.main.GameBot.models.User;
 import app.main.GameBot.other.Logger;
-import app.main.GameBot.repositories.InventoryRepository;
+import app.main.GameBot.repositories.ItemRepository;
 import app.main.GameBot.repositories.PlayerRepository;
 import app.main.GameBot.repositories.UserRepository;
 import app.main.GameBot.states.UserState;
@@ -35,7 +35,7 @@ public class GameBot extends TelegramLongPollingBot {
     private final MenuHandler menuHandler;
     private final PlayerHandler playerHandler;
     private final PlayerRepository playerRepository;
-    private final InventoryRepository inventoryRepository;
+    private final ItemRepository inventoryRepository;
     private final Logger logger;
 
     private List<User> users = new ArrayList<>();
@@ -43,7 +43,7 @@ public class GameBot extends TelegramLongPollingBot {
 
     public GameBot(BotConfig botConfig, UserRepository userRepository, InventoryHandler inventoryHandler,
                    LocationHandler locationHandler, MenuHandler menuHandler,
-                   PlayerHandler playerHandler, PlayerRepository playerRepository, InventoryRepository inventoryRepository, Logger logger) {
+                   PlayerHandler playerHandler, PlayerRepository playerRepository, ItemRepository inventoryRepository, Logger logger) {
         this.botConfig = botConfig;
         this.userRepository = userRepository;
         this.inventoryHandler = inventoryHandler;
@@ -90,6 +90,7 @@ public class GameBot extends TelegramLongPollingBot {
         }
     }
 
+    /*Асинхронный метод для обработки обновлений с типом Message*/
     @Async
     @SneakyThrows
     protected void commandHandler(Update update, User user) {
@@ -97,15 +98,9 @@ public class GameBot extends TelegramLongPollingBot {
         var command = update.getMessage().getText();
         if (command.startsWith("/start")) {
             execute(menuHandler.start(chatId, user.getLanguage()));
-            user.setUserState(UserState.MENU);
-            updateUser(user);
             return;
         }
-        if (user.getUserState().equals(UserState.MENU)) {
-
-        }
-
-        if(user.getUserState().equals(UserState.GET_NAME)){
+        if (user.getUserState().equals(UserState.GET_NAME)) {
             var nickname = command;
             Player player = playerHandler.create_player(nickname, user);
             playerRepository.save(player);
@@ -113,15 +108,17 @@ public class GameBot extends TelegramLongPollingBot {
             user.setUserState(UserState.MENU);
             updateUser(user);
             execute(menuHandler.greeting(chatId, user.getLanguage(), player.getNickname()));
+            execute(menuHandler.menu(chatId, user.getLanguage()));
         }
     }
 
+    /*Асинхронный метод для обработки обновленйи с типом Callback*/
     @Async
     @SneakyThrows
     protected void callbackHandler(Update update, User user) {
         var callback = update.getCallbackQuery().getData();
         var chatId = update.getCallbackQuery().getFrom().getId();
-        if (user.getUserState().equals(UserState.MENU)) {
+        if (user.getUserState() == null) {
             if (callback.startsWith("lang")) {
                 callback = callback.substring(5);
                 user.setLanguage(callback);
@@ -130,7 +127,34 @@ public class GameBot extends TelegramLongPollingBot {
                 execute(menuHandler.get_name(chatId, user.getLanguage()));
                 return;
             }
-        }if(user.getUserState().equals(UserState.GET_NAME)){
+        }
+        if (user.getUserState().equals(UserState.MENU)) {
+            if (callback.startsWith("character")) {
+                execute(playerHandler.character_menu(chatId, user.getLanguage()));
+                return;
+            }
+            if(callback.startsWith("characteristics")){
+
+            }
+            if (callback.startsWith("talents")){
+
+            }
+            if (callback.startsWith("inventory")) {
+
+            }
+            if (callback.startsWith("action")) {
+
+            }
+            if (callback.startsWith("changeLocation")) {
+
+            }
+
+            if (callback.startsWith("back")) {
+                execute(menuHandler.menu(chatId, user.getLanguage()));
+                return;
+            }
+        }
+        if (user.getUserState().equals(UserState.GET_NAME)) {
             var nickname = update.getCallbackQuery().getFrom().getUserName();
             Player player = playerHandler.create_player(nickname, user);
             playerRepository.save(player);
@@ -138,6 +162,8 @@ public class GameBot extends TelegramLongPollingBot {
             user.setUserState(UserState.MENU);
             updateUser(user);
             execute(menuHandler.greeting(chatId, user.getLanguage(), player.getNickname()));
+            execute(menuHandler.menu(chatId, user.getLanguage()));
+            return;
         }
     }
 
@@ -151,6 +177,7 @@ public class GameBot extends TelegramLongPollingBot {
         return botConfig.getBOT_TOKEN();
     }
 
+    /*Метод для обновления атрибутов пользователя*/
     private void updateUser(User user) {
         userRepository.save(user);
         userMap.put(user.getChatId(), user);

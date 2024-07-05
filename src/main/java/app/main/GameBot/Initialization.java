@@ -7,7 +7,7 @@ import app.main.GameBot.bot.handler.LocationHandler;
 import app.main.GameBot.bot.handler.MenuHandler;
 import app.main.GameBot.bot.handler.PlayerHandler;
 import app.main.GameBot.other.Logger;
-import app.main.GameBot.repositories.InventoryRepository;
+import app.main.GameBot.repositories.ItemRepository;
 import app.main.GameBot.repositories.PlayerRepository;
 import app.main.GameBot.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class Initialization {
     private final MenuHandler menuHandler;
     private final PlayerHandler playerHandler;
     private final PlayerRepository playerRepository;
-    private final InventoryRepository inventoryRepository;
+    private final ItemRepository inventoryRepository;
     private final Logger logger;
 
     @EventListener(ContextRefreshedEvent.class)

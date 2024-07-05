@@ -11,12 +11,19 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "inventory")
-public class Inventory {
+@Table(name = "item")
+public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column
     private String itemName;
+
+    @OneToOne
+    @JoinColumn(name = "player_id")
+    private Player player;
+
+    @Column
+    private Integer count;
 }

@@ -17,11 +17,11 @@ public class MenuHandler {
     private final MenuKeyboard menuKeyboard;
 
 
-    private void choose_lang(String lang){
-        if(lang.startsWith("rus")){
-        messager = new MessagerRu();
-        }else if (lang.startsWith("eng")){
-           messager = new MessagerEn();
+    private void choose_lang(String lang) {
+        if (lang.startsWith("rus")) {
+            messager = new MessagerRu();
+        } else if (lang.startsWith("eng")) {
+            messager = new MessagerEn();
         }
     }
 
@@ -41,12 +41,21 @@ public class MenuHandler {
         sendMessage.setReplyMarkup(menuKeyboard.use_tg_name(messager.getGet_tg_name()));
         return sendMessage;
     }
-    public SendMessage greeting(Long chatId, String lang, String name){
+
+    public SendMessage greeting(Long chatId, String lang, String name) {
         choose_lang(lang);
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(messager.getGreeting() + name);
+        return sendMessage;
+    }
 
+    public SendMessage menu(Long chatId, String lang) {
+        choose_lang(lang);
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getMenu());
+        sendMessage.setReplyMarkup(menuKeyboard.menu(lang));
         return sendMessage;
     }
 }

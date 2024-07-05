@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 public class Logger {
 
     public void log(String username, Integer playerId, String action, String option){
-        System.out.println("игрок" + username + " (ID:" + playerId + ") сделал " +
+        System.out.println("игрок " + username + " (ID:" + playerId + ") сделал " +
                 action + ", выбрал " + option);
     }
 }
