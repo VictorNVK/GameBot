@@ -35,5 +35,18 @@ public class PlayerKeyboard extends Keyboard {
         keyboardMarkup.setKeyboard(rows);
         return keyboardMarkup;
     }
+    public InlineKeyboardMarkup characteristics_keyboard(String lang){
+        choose_lang(lang);
+        var keyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        List<InlineKeyboardButton> row1 = new ArrayList<>();
+        var back = new InlineKeyboardButton();
+        back.setText(messager.getBack());
+        back.setCallbackData("back");
+        row1.add(back);
+        rows.add(row1);
+        keyboardMarkup.setKeyboard(rows);
+        return keyboardMarkup;
+    }
 
 }

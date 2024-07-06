@@ -21,6 +21,8 @@ import java.util.Random;
 
 @Component
 @RequiredArgsConstructor
+/*Класс управления для обновлений связанных с локациями, все методы вызываюся в главном классе бота, но есть и
+вспомогательные*/
 public class LocationHandler {
 
     private Messager messager;
@@ -109,7 +111,6 @@ public class LocationHandler {
             Item item1 = itemRepository.findItemByItemNameEnAndPlayer(item.getItemNameEn(), player);
             item1.setCount(item1.getCount() + item.getCount());
             itemRepository.save(item1);
-            logger.log(player.getNickname(), player.getId(), "нашёл предмет", item.getItemNameRu() + " " + item.getCount());
         }else {
             itemRepository.save(item);
         }
@@ -118,6 +119,7 @@ public class LocationHandler {
         }else {
             sendMessage.setText(messager.getYourItemFind() + item.getItemNameEn() + " " + item.getCount() + "x");
         }
+        logger.log(player.getNickname(), player.getId(), "нашёл предмет", item.getItemNameRu() + " " + item.getCount());
         return sendMessage;
     }
 

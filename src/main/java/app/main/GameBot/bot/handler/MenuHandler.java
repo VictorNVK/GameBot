@@ -11,6 +11,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 @Component
 @RequiredArgsConstructor
+/*Класс управления для обновлений связанных с меню, все методы вызываюся в главном классе бота, но есть и
+вспомогательные*/
 public class MenuHandler {
 
     private Messager messager;

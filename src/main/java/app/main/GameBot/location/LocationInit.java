@@ -57,7 +57,7 @@ public class LocationInit {
         flask.setItemNameEn("Flask\uD83E\uDED9");
 
         var core = new Item();
-        flask.setCount(1);
+        core.setCount(1);
         core.setItemNameRu("Малое ядро");
         core.setItemNameEn("Small core");
 

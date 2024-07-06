@@ -13,6 +13,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 @Component
 @RequiredArgsConstructor
+/*Класс управления для обновлений связанных с игроком, все методы вызываюся в главном классе бота, но есть и
+вспомогательные*/
 public class PlayerHandler {
 
     private Messager messager;
@@ -67,6 +69,7 @@ public class PlayerHandler {
         +"\n" + messager.getEnergyRegeneration() + player.getEnergyRegeneration()
         +"\n" + messager.getBloodRegeneration() + player.getBloodRegeneration());
 
+        sendMessage.setReplyMarkup(playerKeyboard.characteristics_keyboard(lang));
         return sendMessage;
     }
 }
