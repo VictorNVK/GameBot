@@ -23,7 +23,7 @@ public class Item {
     @Column
     private String itemNameEn;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "player_id")
     private Player player;
 

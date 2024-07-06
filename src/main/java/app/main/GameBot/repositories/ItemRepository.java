@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Integer> {
     List<Item> findItemsByPlayer(Player player);
+    Item findItemByItemNameEnAndPlayer(String name, Player player);
 }

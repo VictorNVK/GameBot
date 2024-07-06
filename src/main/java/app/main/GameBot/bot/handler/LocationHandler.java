@@ -5,11 +5,17 @@ import app.main.GameBot.bot.messager.Messager;
 import app.main.GameBot.bot.messager.MessagerEn;
 import app.main.GameBot.bot.messager.MessagerRu;
 import app.main.GameBot.location.LocationInit;
+import app.main.GameBot.models.Item;
 import app.main.GameBot.models.Player;
+import app.main.GameBot.repositories.ItemRepository;
+import app.main.GameBot.repositories.PlayerRepository;
 import app.main.GameBot.states.Location;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 @Component
 @RequiredArgsConstructor
@@ -18,6 +24,8 @@ public class LocationHandler {
     private Messager messager;
     private final LocationKeyboard locationKeyboard;
     private final LocationInit locationInit;
+    private final ItemRepository itemRepository;
+    private final PlayerRepository playerRepository;
 
 
     private void choose_lang(String lang) {
@@ -42,12 +50,50 @@ public class LocationHandler {
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         if(player.getLocation().equals(Location.CLEARING)){
-            
+            sendMessage = item(sendMessage, player, lang);
         }
-        if(player.getLocation().equals(Location.SUBURB)){
-
+        else if(player.getLocation().equals(Location.SUBURB)){
+            sendMessage = item(sendMessage, player, lang);
         }
 
+        return sendMessage;
+    }
+    public SendMessage search_await(Long chatId, String lang){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getSearch_await());
+        return sendMessage;
+    }
+
+    private Item searchRandomItem(ArrayList<Item> items, Player player, Integer rooms){
+        var random = new Random();
+        var randomRoom = random.nextInt(rooms) + 1;
+        player.setRoom(randomRoom);
+        playerRepository.save(player);
+
+        var index = random.nextInt(items.size());
+        var randomItem = items.get(index);
+        randomItem.setPlayer(player);
+
+        return randomItem;
+        /*В дальнейшем здесь можно будет реализовать встречу игроков*/
+    }
+    private SendMessage item(SendMessage sendMessage, Player player, String lang){
+        Item item = searchRandomItem(locationInit.getClearing().getItems(),
+                player, locationInit.getClearing().getRooms());
+        if(itemRepository.findItemByItemNameEnAndPlayer(item.getItemNameEn(), player) != null){
+            Item item1 = itemRepository.findItemByItemNameEnAndPlayer(item.getItemNameEn(), player);
+            item1.setCount(item1.getCount() + item.getCount());
+            itemRepository.save(item1);
+        }else {
+            itemRepository.save(item);
+        }
+        if(lang.equals("rus")) {
+            sendMessage.setText(messager.getYourItemFind() + item.getItemNameRu() + " " + item.getCount() + "x");
+        }else {
+            sendMessage.setText(messager.getYourItemFind() + item.getItemNameEn() + " " + item.getCount() + "x");
+        }
         return sendMessage;
     }
 }

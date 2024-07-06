@@ -1,5 +1,5 @@
 package app.main.GameBot.states;
 
 public enum UserState {
-    MENU, GET_NAME
+    MENU, GET_NAME, SEARCH
 }

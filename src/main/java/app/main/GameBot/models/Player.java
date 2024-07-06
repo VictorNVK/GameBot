@@ -44,6 +44,9 @@ public class Player {
     private Integer defense;
 
     @Column
+    private Integer room;
+
+    @Column
     private Integer HealthRegeneration;
 
     @Column

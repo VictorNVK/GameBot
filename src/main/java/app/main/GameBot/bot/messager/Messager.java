@@ -46,4 +46,7 @@ public abstract class Messager {
     private String location_menu;
     private String locationResearch;
     private String craft;
+    private String search_await;
+
+    private String yourItemFind;
 }

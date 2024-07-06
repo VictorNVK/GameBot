@@ -17,11 +17,14 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /*Главный метод бота. Здесь обрабатываются все обновления от клиента, после чего вызываются нужные хендлеры
  * для дальнейшей обработки и обновления*/
@@ -96,7 +99,7 @@ public class GameBot extends TelegramLongPollingBot {
     protected void commandHandler(Update update, User user) {
         var chatId = update.getMessage().getChat().getId();
         var command = update.getMessage().getText();
-        if (command.startsWith("/start")) {
+        if (command.startsWith("/start") && user.getUserState() == null) {
             execute(menuHandler.start(chatId, user.getLanguage()));
             return;
         }
@@ -135,32 +138,32 @@ public class GameBot extends TelegramLongPollingBot {
         if (user.getUserState().equals(UserState.MENU)) {
             if (callback.equals("character")) {
                 execute(playerHandler.character_menu(chatId, user.getLanguage()));
-                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню",
+                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню",
                         "персонаж");
                 return;
             }
             if(callback.startsWith("characteristics")){
                 execute(playerHandler.sendCharacteristics(chatId, user.getLanguage(), player));
-                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню персонажа",
+                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню персонажа",
                         "харрактеристика");
                 return;
             }
             if (callback.startsWith("talents")){
                 execute(menuHandler.in_dev(chatId, user.getLanguage()));
-                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню персонажа",
+                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню персонажа",
                         "таланты");
                 return;
             }
             if (callback.startsWith("inventory")) {
                 execute(inventoryHandler.inventory_menu(chatId, user.getLanguage()));
-                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню",
+                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню",
                         "инвентарь");
                 return;
 
             }
             if(callback.startsWith("items")){
                 execute(menuHandler.in_dev(chatId, user.getLanguage()));
-                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню инвенторя",
+                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню инвенторя",
                         "Предметы");
                 return;
             }
@@ -171,30 +174,47 @@ public class GameBot extends TelegramLongPollingBot {
             }
             if(callback.startsWith("artifacts")){
                 execute(menuHandler.in_dev(chatId, user.getLanguage()));
-                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню инвенторя",
+                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню инвенторя",
                         "Артефакты");
                 return;
             }
             if (callback.startsWith("action")) {
                 execute(locationHandler.action_menu(chatId, user.getLanguage()));
-                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню",
+                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню",
                         "действие в локации");
                 return;
             }
-            if (callback.startsWith("search")) {
-                execute(locationHandler.search(chatId, user.getLanguage(), player));
-                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню действие в локации",
+            if (callback.startsWith("search") && !user.getUserState().equals(UserState.SEARCH)) {
+                execute(locationHandler.search_await(chatId, user.getLanguage()));
+                user.setUserState(UserState.SEARCH);
+                updateUser(user);
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        TimeUnit.SECONDS.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        execute(locationHandler.search(chatId, user.getLanguage(), player));
+                        user.setUserState(UserState.MENU);
+                        updateUser(user);
+                    } catch (TelegramApiException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню действие в локации",
                         "исследование локации");
                 return;
             }
             if (callback.startsWith("craft")) {
                 execute(menuHandler.in_dev(chatId, user.getLanguage()));
-                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню действие в локации",
+                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню действие в локации",
                         "крафт");
                 return;
             }
             if (callback.startsWith("changeLocation")) {
-                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню",
+                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню",
                         "сменить локацию");
                 return;
             }
