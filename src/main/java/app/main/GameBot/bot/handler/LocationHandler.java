@@ -7,6 +7,7 @@ import app.main.GameBot.bot.messager.MessagerRu;
 import app.main.GameBot.location.LocationInit;
 import app.main.GameBot.models.Item;
 import app.main.GameBot.models.Player;
+import app.main.GameBot.other.Logger;
 import app.main.GameBot.repositories.ItemRepository;
 import app.main.GameBot.repositories.PlayerRepository;
 import app.main.GameBot.states.Location;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 @Component
@@ -26,6 +28,7 @@ public class LocationHandler {
     private final LocationInit locationInit;
     private final ItemRepository itemRepository;
     private final PlayerRepository playerRepository;
+    private final Logger logger;
 
 
     private void choose_lang(String lang) {
@@ -50,10 +53,15 @@ public class LocationHandler {
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         if(player.getLocation().equals(Location.CLEARING)){
-            sendMessage = item(sendMessage, player, lang);
+            Item item = searchRandomItem(locationInit.getClearing().getItems(),
+                    player, locationInit.getClearing().getRooms());
+            sendMessage = item(sendMessage, player, lang, item);
+
         }
         else if(player.getLocation().equals(Location.SUBURB)){
-            sendMessage = item(sendMessage, player, lang);
+            Item item = searchRandomItem(locationInit.getSuburb().getItems(),
+                    player, locationInit.getClearing().getRooms());
+            sendMessage = item(sendMessage, player, lang, item);
         }
 
         return sendMessage;
@@ -63,6 +71,22 @@ public class LocationHandler {
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(messager.getSearch_await());
+        return sendMessage;
+    }
+    public SendMessage change_location(Long chatId, String lang){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getChooseLocationToChange());
+        List<app.main.GameBot.location.Location> locations = locationInit.getLocations();
+        sendMessage.setReplyMarkup(locationKeyboard.location_list_keyboard(locations, lang));
+        return sendMessage;
+    }
+    public SendMessage location_has_been_chosen(Long chatId, String lang){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getLocation_has_been_chosen());
         return sendMessage;
     }
 
@@ -79,13 +103,13 @@ public class LocationHandler {
         return randomItem;
         /*В дальнейшем здесь можно будет реализовать встречу игроков*/
     }
-    private SendMessage item(SendMessage sendMessage, Player player, String lang){
-        Item item = searchRandomItem(locationInit.getClearing().getItems(),
-                player, locationInit.getClearing().getRooms());
+    private SendMessage item(SendMessage sendMessage, Player player, String lang, Item item){
+
         if(itemRepository.findItemByItemNameEnAndPlayer(item.getItemNameEn(), player) != null){
             Item item1 = itemRepository.findItemByItemNameEnAndPlayer(item.getItemNameEn(), player);
             item1.setCount(item1.getCount() + item.getCount());
             itemRepository.save(item1);
+            logger.log(player.getNickname(), player.getId(), "нашёл предмет", item.getItemNameRu() + " " + item.getCount());
         }else {
             itemRepository.save(item);
         }
@@ -96,4 +120,5 @@ public class LocationHandler {
         }
         return sendMessage;
     }
+
 }

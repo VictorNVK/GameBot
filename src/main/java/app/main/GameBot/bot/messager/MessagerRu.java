@@ -48,7 +48,9 @@ public class MessagerRu extends Messager {
     private final String location_menu = "Выберите пункт в меню исследование локации";
     private final String locationResearch = "Исследование локации\uD83D\uDD0E";
     private final String craft = "Крафт(В разработке\uD83D\uDEE0)";
-    private final String search_await = "Идёт поиск предемта, ожидайте\uD83D\uDD0E";
+    private final String search_await = "Идёт поиск предмета, ожидайте\uD83D\uDD0E";
 
     private final String yourItemFind = "Вы нашли предмет: ";
+    private final String chooseLocationToChange = "Выберите локацию для исследования :";
+    private final String location_has_been_chosen = "Локация была выбрана, выберите действие";
 }

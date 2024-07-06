@@ -46,11 +46,11 @@ public class InventoryHandler {
 
             if(lang.equals("rus")) {
                 for (Item item : items) {
-                    text = text + item.getItemNameRu() + " " + item.getCount() + "\n";
+                    text = text + item.getItemNameRu() + " " + item.getCount() + "x" + "\n";
                 }
             }else if (lang.equals("eng")){
                 for (Item item : items) {
-                    text = text + item.getItemNameEn() + " " + item.getCount() + "\n";
+                    text = text + item.getItemNameEn() + " " + item.getCount() + "x" + "\n";
                 }
             }
             sendMessage.setText(text);

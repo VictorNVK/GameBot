@@ -49,4 +49,6 @@ public abstract class Messager {
     private String search_await;
 
     private String yourItemFind;
+    private String chooseLocationToChange;
+    private String location_has_been_chosen;
 }

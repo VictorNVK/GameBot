@@ -11,6 +11,7 @@ import app.main.GameBot.other.Logger;
 import app.main.GameBot.repositories.ItemRepository;
 import app.main.GameBot.repositories.PlayerRepository;
 import app.main.GameBot.repositories.UserRepository;
+import app.main.GameBot.states.Location;
 import app.main.GameBot.states.UserState;
 import lombok.SneakyThrows;
 import org.springframework.scheduling.annotation.Async;
@@ -159,7 +160,6 @@ public class GameBot extends TelegramLongPollingBot {
                 logger.log(player.getNickname(), user.getId(), "выбрал пункт меню",
                         "инвентарь");
                 return;
-
             }
             if(callback.startsWith("items")){
                 execute(menuHandler.in_dev(chatId, user.getLanguage()));
@@ -196,6 +196,7 @@ public class GameBot extends TelegramLongPollingBot {
                     }
                     try {
                         execute(locationHandler.search(chatId, user.getLanguage(), player));
+                        execute(locationHandler.action_menu(chatId, user.getLanguage()));
                         user.setUserState(UserState.MENU);
                         updateUser(user);
                     } catch (TelegramApiException e) {
@@ -214,9 +215,26 @@ public class GameBot extends TelegramLongPollingBot {
                 return;
             }
             if (callback.startsWith("changeLocation")) {
+                execute(locationHandler.change_location(chatId, user.getLanguage()));
                 logger.log(player.getNickname(), user.getId(), "выбрал пункт меню",
                         "сменить локацию");
                 return;
+            }
+            if(callback.startsWith("Clearing")){
+                player.setLocation(Location.CLEARING);
+                execute(locationHandler.location_has_been_chosen(chatId, user.getLanguage()));
+                execute(locationHandler.action_menu(chatId, user.getLanguage()));
+                playerRepository.save(player);
+                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню смена локации",
+                        "Поляна");
+            }
+            if(callback.startsWith("Suburb")){
+                player.setLocation(Location.SUBURB);
+                execute(locationHandler.location_has_been_chosen(chatId, user.getLanguage()));
+                execute(locationHandler.action_menu(chatId, user.getLanguage()));
+                playerRepository.save(player);
+                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню смена локации",
+                        "Пригород");
             }
 
             if (callback.startsWith("back")) {
