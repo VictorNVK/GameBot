@@ -39,7 +39,7 @@ public class PlayerHandler {
         player.setHealthRegeneration(1);
         player.setEnergyRegeneration(1);
         player.setBloodRegeneration(1);
-        player.setLocation(Location.GLADE);
+        player.setLocation(Location.CLEARING);
         return player;
     }
 

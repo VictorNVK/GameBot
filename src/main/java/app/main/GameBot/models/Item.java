@@ -18,7 +18,10 @@ public class Item {
     private Integer id;
 
     @Column
-    private String itemName;
+    private String itemNameRu;
+
+    @Column
+    private String itemNameEn;
 
     @OneToOne
     @JoinColumn(name = "player_id")

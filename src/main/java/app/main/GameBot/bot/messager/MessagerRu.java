@@ -44,4 +44,8 @@ public class MessagerRu extends Messager {
     private final String inventoryIsEmpty = "Нет ингридиентов для крафта❌";
     private final String yourInventory = "Ваши ингриенты для крафта :\n\n";
 
+
+    private final String location_menu = "Выберите пункт в меню исследование локации";
+    private final String locationResearch = "Исследование локации\uD83D\uDD0E";
+    private final String craft = "Крафт(В разработке\uD83D\uDEE0)";
 }

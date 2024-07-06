@@ -155,30 +155,48 @@ public class GameBot extends TelegramLongPollingBot {
                 execute(inventoryHandler.inventory_menu(chatId, user.getLanguage()));
                 logger.log(player.getNickname(), user.getId(), "выбрал пукт меню",
                         "инвентарь");
+                return;
 
             }
             if(callback.startsWith("items")){
                 execute(menuHandler.in_dev(chatId, user.getLanguage()));
                 logger.log(player.getNickname(), user.getId(), "выбрал пукт меню инвенторя",
                         "Предметы");
+                return;
             }
             if(callback.startsWith("ingredients")){
                 var items = itemRepository.findItemsByPlayer(player);
                 execute(inventoryHandler.ingredients(chatId, user.getLanguage(), items));
+                return;
             }
             if(callback.startsWith("artifacts")){
                 execute(menuHandler.in_dev(chatId, user.getLanguage()));
                 logger.log(player.getNickname(), user.getId(), "выбрал пукт меню инвенторя",
                         "Артефакты");
+                return;
             }
             if (callback.startsWith("action")) {
+                execute(locationHandler.action_menu(chatId, user.getLanguage()));
                 logger.log(player.getNickname(), user.getId(), "выбрал пукт меню",
                         "действие в локации");
+                return;
+            }
+            if (callback.startsWith("search")) {
+                execute(locationHandler.search(chatId, user.getLanguage(), player));
+                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню действие в локации",
+                        "исследование локации");
+                return;
+            }
+            if (callback.startsWith("craft")) {
+                execute(menuHandler.in_dev(chatId, user.getLanguage()));
+                logger.log(player.getNickname(), user.getId(), "выбрал пукт меню действие в локации",
+                        "крафт");
+                return;
             }
             if (callback.startsWith("changeLocation")) {
                 logger.log(player.getNickname(), user.getId(), "выбрал пукт меню",
                         "сменить локацию");
-
+                return;
             }
 
             if (callback.startsWith("back")) {

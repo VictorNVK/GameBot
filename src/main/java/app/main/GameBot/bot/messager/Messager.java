@@ -42,4 +42,8 @@ public abstract class Messager {
 
     private String inventoryIsEmpty;
     private String yourInventory;
+
+    private String location_menu;
+    private String locationResearch;
+    private String craft;
 }

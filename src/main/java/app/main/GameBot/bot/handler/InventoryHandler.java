@@ -1,7 +1,6 @@
 package app.main.GameBot.bot.handler;
 
 import app.main.GameBot.bot.keyboard.InventoryKeyboard;
-import app.main.GameBot.bot.keyboard.MenuKeyboard;
 import app.main.GameBot.bot.messager.Messager;
 import app.main.GameBot.bot.messager.MessagerEn;
 import app.main.GameBot.bot.messager.MessagerRu;
@@ -44,8 +43,15 @@ public class InventoryHandler {
             sendMessage.setText(messager.getInventoryIsEmpty());
         }else {
             var text = messager.getYourInventory();
-            for(Item item : items){
-               text = text + item.getItemName() + " " + item.getCount() + "\n";
+
+            if(lang.equals("rus")) {
+                for (Item item : items) {
+                    text = text + item.getItemNameRu() + " " + item.getCount() + "\n";
+                }
+            }else if (lang.equals("eng")){
+                for (Item item : items) {
+                    text = text + item.getItemNameEn() + " " + item.getCount() + "\n";
+                }
             }
             sendMessage.setText(text);
         }
