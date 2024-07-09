@@ -32,7 +32,7 @@ public class PlayerHandler {
         var player = new Player();
         player.setId(user.getId());
         player.setNickname(name);
-        player.setLevel(1);
+        player.setLevel(0);
         player.setHealth(20);
         player.setEnergy(10);
         player.setBlood(5);

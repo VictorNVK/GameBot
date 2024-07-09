@@ -5,6 +5,8 @@ import app.main.GameBot.bot.handler.InventoryHandler;
 import app.main.GameBot.bot.handler.LocationHandler;
 import app.main.GameBot.bot.handler.MenuHandler;
 import app.main.GameBot.bot.handler.PlayerHandler;
+import app.main.GameBot.bot.service.MenuService;
+import app.main.GameBot.bot.service.PlayerService;
 import app.main.GameBot.models.Player;
 import app.main.GameBot.models.User;
 import app.main.GameBot.other.Logger;
@@ -17,6 +19,7 @@ import lombok.SneakyThrows;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -33,30 +36,26 @@ import java.util.concurrent.TimeUnit;
 public class GameBot extends TelegramLongPollingBot {
 
     private final BotConfig botConfig;
-    private final InventoryHandler inventoryHandler;
     private final LocationHandler locationHandler;
-    private final MenuHandler menuHandler;
-    private final PlayerHandler playerHandler;
     private final PlayerRepository playerRepository;
-    private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final Logger logger;
+    private final MenuService menuService;
+    private final PlayerService playerService;
 
     private List<User> users = new ArrayList<>();
     private Map<Long, User> userMap = new HashMap<>();
 
-    public GameBot(BotConfig botConfig, InventoryHandler inventoryHandler,
-                   LocationHandler locationHandler, MenuHandler menuHandler,
-                   PlayerHandler playerHandler, PlayerRepository playerRepository, ItemRepository inventoryRepository, UserRepository userRepository, Logger logger) {
+    public GameBot(BotConfig botConfig,
+                   LocationHandler locationHandler,
+                   PlayerRepository playerRepository,UserRepository userRepository, Logger logger, MenuService menuService, PlayerService playerService) {
         this.botConfig = botConfig;
-        this.inventoryHandler = inventoryHandler;
         this.locationHandler = locationHandler;
-        this.menuHandler = menuHandler;
-        this.playerHandler = playerHandler;
         this.playerRepository = playerRepository;
-        this.itemRepository = inventoryRepository;
         this.userRepository = userRepository;
         this.logger = logger;
+        this.menuService = menuService;
+        this.playerService = playerService;
     }
 
     @Override
@@ -98,22 +97,20 @@ public class GameBot extends TelegramLongPollingBot {
     @Async
     @SneakyThrows
     protected void commandHandler(Update update, User user) {
-        var chatId = update.getMessage().getChat().getId();
-        var command = update.getMessage().getText();
-        if (command.startsWith("/start") && user.getUserState() == null) {
-            execute(menuHandler.start(chatId, user.getLanguage()));
+        if (user.getUserState() == null) {
+            List<BotApiMethodMessage> messages = menuService.message_menu_handle(update, user);
+            sendMessages(messages);
+            updateUser(menuService.get_user());
+
             return;
         }
         if (user.getUserState().equals(UserState.GET_NAME)) {
-            var nickname = command;
-            Player player = playerHandler.create_player(nickname, user);
-            playerRepository.save(player);
-            logger.log(nickname, player.getId(), "зарегистрировался", null);
             user.setUserState(UserState.MENU);
-            updateUser(user);
-            execute(menuHandler.greeting(chatId, user.getLanguage(), player.getNickname()));
-            execute(menuHandler.menu(chatId, user.getLanguage()));
+            List<BotApiMethodMessage> messages = menuService.message_menu_handle(update, user);
+            updateUser(menuService.get_user());
+            sendMessages(messages);
         }
+        /*ToDo*/
     }
 
     /*Асинхронный метод для обработки обновленйи с типом Callback*/
@@ -125,65 +122,18 @@ public class GameBot extends TelegramLongPollingBot {
         var chatId = update.getCallbackQuery().getFrom().getId();
 
         if (user.getUserState() == null) {
-            if (callback.startsWith("lang")) {
-                callback = callback.substring(5);
-                user.setLanguage(callback);
-                user.setUserState(UserState.GET_NAME);
-                updateUser(user);
-                execute(menuHandler.get_name(chatId, user.getLanguage()));
-                return;
-            }
+            sendMessages(menuService.callback_menu_handle(update, user));
+            updateUser(menuService.get_user());
+            return;
         }
         Player player = playerRepository.findPlayerById(user.getId());
 
-        if (user.getUserState().equals(UserState.MENU)) {
-            if (callback.equals("character")) {
-                execute(playerHandler.character_menu(chatId, user.getLanguage()));
-                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню",
-                        "персонаж");
-                return;
-            }
-            if(callback.startsWith("characteristics")){
-                execute(playerHandler.sendCharacteristics(chatId, user.getLanguage(), player));
-                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню персонажа",
-                        "харрактеристика");
-                return;
-            }
-            if (callback.startsWith("talents")){
-                execute(menuHandler.in_dev(chatId, user.getLanguage()));
-                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню персонажа",
-                        "таланты");
-                return;
-            }
-            if (callback.startsWith("inventory")) {
-                execute(inventoryHandler.inventory_menu(chatId, user.getLanguage()));
-                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню",
-                        "инвентарь");
-                return;
-            }
-            if(callback.startsWith("items")){
-                execute(menuHandler.in_dev(chatId, user.getLanguage()));
-                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню инвенторя",
-                        "Предметы");
-                return;
-            }
-            if(callback.startsWith("ingredients")){
-                var items = itemRepository.findItemsByPlayer(player);
-                execute(inventoryHandler.ingredients(chatId, user.getLanguage(), items));
-                return;
-            }
-            if(callback.startsWith("artifacts")){
-                execute(menuHandler.in_dev(chatId, user.getLanguage()));
-                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню инвенторя",
-                        "Артефакты");
-                return;
-            }
-            if (callback.startsWith("action")) {
-                execute(locationHandler.action_menu(chatId, user.getLanguage()));
-                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню",
-                        "действие в локации");
-                return;
-            }
+
+        if(user.getUserState().equals(UserState.MENU)) {
+             sendMessages(playerService.callback_menu_handle(update, user, player));
+             updateUser(playerService.get_user());
+             playerRepository.save(playerService.get_player());
+
             if (callback.startsWith("search") && !user.getUserState().equals(UserState.SEARCH)) {
                 execute(locationHandler.search_await(chatId, user.getLanguage()));
                 user.setUserState(UserState.SEARCH);
@@ -208,51 +158,13 @@ public class GameBot extends TelegramLongPollingBot {
                         "исследование локации");
                 return;
             }
-            if (callback.startsWith("craft")) {
-                execute(menuHandler.in_dev(chatId, user.getLanguage()));
-                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню действие в локации",
-                        "крафт");
-                return;
-            }
-            if (callback.startsWith("changeLocation")) {
-                execute(locationHandler.change_location(chatId, user.getLanguage()));
-                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню",
-                        "сменить локацию");
-                return;
-            }
-            if(callback.startsWith("Clearing")){
-                player.setLocation(Location.CLEARING);
-                execute(locationHandler.location_has_been_chosen(chatId, user.getLanguage()));
-                execute(locationHandler.action_menu(chatId, user.getLanguage()));
-                playerRepository.save(player);
-                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню смена локации",
-                        "Поляна");
-            }
-            if(callback.startsWith("Suburb")){
-                player.setLocation(Location.SUBURB);
-                execute(locationHandler.location_has_been_chosen(chatId, user.getLanguage()));
-                execute(locationHandler.action_menu(chatId, user.getLanguage()));
-                playerRepository.save(player);
-                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню смена локации",
-                        "Пригород");
-            }
-
-            if (callback.startsWith("back")) {
-                execute(menuHandler.menu(chatId, user.getLanguage()));
-                return;
-            }
         }
         if (user.getUserState().equals(UserState.GET_NAME)) {
-            var nickname = update.getCallbackQuery().getFrom().getUserName();
-            Player newPlayer = playerHandler.create_player(nickname, user);
-            playerRepository.save(newPlayer);
-            logger.log(nickname, newPlayer.getId(), "зарегистрировался", null);
-            user.setUserState(UserState.MENU);
-            updateUser(user);
-            execute(menuHandler.greeting(chatId, user.getLanguage(), newPlayer.getNickname()));
-            execute(menuHandler.menu(chatId, user.getLanguage()));
-            return;
+            List<BotApiMethodMessage> messages = menuService.callback_menu_handle(update, user);
+            updateUser(menuService.get_user());
+            sendMessages(messages);
         }
+        /*ToDo*/
     }
 
     @Override
@@ -271,4 +183,12 @@ public class GameBot extends TelegramLongPollingBot {
         userMap.put(user.getChatId(), user);
     }
 
+    @SneakyThrows
+    private void sendMessages(List<BotApiMethodMessage> messages) {
+        if(!messages.isEmpty()) {
+            for (BotApiMethodMessage botApiMethodMessage : messages) {
+                execute(botApiMethodMessage);
+            }
+        }
+    }
 }
