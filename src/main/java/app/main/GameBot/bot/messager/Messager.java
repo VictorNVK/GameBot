@@ -51,4 +51,5 @@ public abstract class Messager {
     private String yourItemFind;
     private String chooseLocationToChange;
     private String location_has_been_chosen;
+    private String start_location;
 }

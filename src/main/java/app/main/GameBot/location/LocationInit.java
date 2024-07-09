@@ -3,23 +3,23 @@ package app.main.GameBot.location;
 import app.main.GameBot.models.Item;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 @Getter
 public class LocationInit {
 
     private Location clearing;
     private Location suburb;
-    private List<Location> locations = new ArrayList<>();
+    private final List<Location> locations = new ArrayList<>();
 
     @PostConstruct
-    private void create_clearing(){
+    private void init_locations(){
+        /*Поляна*/
+        Clearing clearing = new Clearing();
         var grass = new Item();
         grass.setCount(2);
         grass.setItemNameRu("Простые травы\uD83C\uDF31");
@@ -35,17 +35,14 @@ public class LocationInit {
         leaves.setItemNameRu("Листья\uD83C\uDF3F");
         leaves.setItemNameEn("Leaves\uD83C\uDF3F");
 
-
-        ArrayList<Item> items = new ArrayList<>();
-        items.add(grass);
-        items.add(branch);
-        items.add(leaves);
-
-        this.clearing = new Location("Поляна","Clearing", items, 3);
+        clearing.getItems().add(grass);
+        clearing.getItems().add(branch);
+        clearing.getItems().add(leaves);
         locations.add(clearing);
-    }
-    @PostConstruct
-    private void create_suburb(){
+        this.clearing = clearing;
+
+        /*Пригород*/
+        Suburb suburb = new Suburb();
         var stone = new Item();
         stone.setCount(2);
         stone.setItemNameRu("Маленький камень\uD83E\uDEA8");
@@ -61,12 +58,11 @@ public class LocationInit {
         core.setItemNameRu("Малое ядро");
         core.setItemNameEn("Small core");
 
-        ArrayList<Item> items = new ArrayList<>();
-        items.add(stone);
-        items.add(flask);
-        items.add(core);
+        suburb.getItems().add(stone);
+        suburb.getItems().add(flask);
+        suburb.getItems().add(core);
 
-        this.suburb = new Location("Пригород","Suburb", items, 3);
+        this.suburb = suburb;
         locations.add(suburb);
     }
 }

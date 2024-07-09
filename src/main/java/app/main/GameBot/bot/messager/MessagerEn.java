@@ -53,4 +53,5 @@ public class MessagerEn extends Messager {
     private final String chooseLocationToChange = "Select a location for exploration:";
     private final String location_has_been_chosen = "Location selected, choose an action";
 
+
 }

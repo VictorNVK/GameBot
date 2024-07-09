@@ -4,7 +4,9 @@ import app.main.GameBot.bot.keyboard.LocationKeyboard;
 import app.main.GameBot.bot.messager.Messager;
 import app.main.GameBot.bot.messager.MessagerEn;
 import app.main.GameBot.bot.messager.MessagerRu;
+import app.main.GameBot.location.Clearing;
 import app.main.GameBot.location.LocationInit;
+import app.main.GameBot.location.Suburb;
 import app.main.GameBot.models.Item;
 import app.main.GameBot.models.Player;
 import app.main.GameBot.other.Logger;
@@ -27,10 +29,10 @@ public class LocationHandler {
 
     private Messager messager;
     private final LocationKeyboard locationKeyboard;
-    private final LocationInit locationInit;
     private final ItemRepository itemRepository;
     private final PlayerRepository playerRepository;
     private final Logger logger;
+    private final LocationInit locationInit;
 
 
     private void choose_lang(String lang) {
@@ -39,6 +41,14 @@ public class LocationHandler {
         } else if (lang.startsWith("eng")) {
             messager = new MessagerEn();
         }
+    }
+
+    public SendMessage clearing_start_location(Long chatId, String lang){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setText(messager.getStart_location());
+        sendMessage.setChatId(chatId);
+        return sendMessage;
     }
 
     public SendMessage action_menu(Long chatId, String lang){
@@ -58,11 +68,10 @@ public class LocationHandler {
             Item item = searchRandomItem(locationInit.getClearing().getItems(),
                     player, locationInit.getClearing().getRooms());
             sendMessage = item(sendMessage, player, lang, item);
-
         }
         else if(player.getLocation().equals(Location.SUBURB)){
             Item item = searchRandomItem(locationInit.getSuburb().getItems(),
-                    player, locationInit.getClearing().getRooms());
+                    player, locationInit.getSuburb().getRooms());
             sendMessage = item(sendMessage, player, lang, item);
         }
 
@@ -106,7 +115,6 @@ public class LocationHandler {
         /*В дальнейшем здесь можно будет реализовать встречу игроков*/
     }
     private SendMessage item(SendMessage sendMessage, Player player, String lang, Item item){
-
         if(itemRepository.findItemByItemNameEnAndPlayer(item.getItemNameEn(), player) != null){
             Item item1 = itemRepository.findItemByItemNameEnAndPlayer(item.getItemNameEn(), player);
             item1.setCount(item1.getCount() + item.getCount());

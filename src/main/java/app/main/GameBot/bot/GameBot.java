@@ -128,7 +128,6 @@ public class GameBot extends TelegramLongPollingBot {
         }
         Player player = playerRepository.findPlayerById(user.getId());
 
-
         if(user.getUserState().equals(UserState.MENU)) {
              sendMessages(playerService.callback_menu_handle(update, user, player));
              updateUser(playerService.get_user());
@@ -154,8 +153,6 @@ public class GameBot extends TelegramLongPollingBot {
                     }
                 });
 
-                logger.log(player.getNickname(), user.getId(), "выбрал пункт меню действие в локации",
-                        "исследование локации");
                 return;
             }
         }

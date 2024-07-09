@@ -1,5 +1,6 @@
 package app.main.GameBot.bot.service;
 
+import app.main.GameBot.bot.handler.LocationHandler;
 import app.main.GameBot.bot.handler.MenuHandler;
 import app.main.GameBot.bot.handler.PlayerHandler;
 import app.main.GameBot.models.Player;
@@ -25,6 +26,7 @@ public class MenuService {
     private final Logger logger;
     private final PlayerRepository playerRepository;
     private final PlayerHandler playerHandler;
+    private final LocationHandler locationHandler;
     private User _user;
     private Player _player;
 
@@ -46,6 +48,7 @@ public class MenuService {
             playerRepository.save(player);
             logger.log(nickname, player.getId(), "зарегистрировался", null);
             messages.add(menuHandler.greeting(chatId, user.getLanguage(), player.getNickname()));
+            messages.add(locationHandler.clearing_start_location(chatId, user.getLanguage()));
             messages.add(menuHandler.menu(chatId, user.getLanguage()));
             return messages;
         }
@@ -74,6 +77,7 @@ public class MenuService {
             logger.log(nickname, newPlayer.getId(), "зарегистрировался", null);
             user.setUserState(UserState.MENU);
             messages.add(menuHandler.greeting(chatId, user.getLanguage(), newPlayer.getNickname()));
+            messages.add(locationHandler.clearing_start_location(chatId, user.getLanguage()));
             messages.add(menuHandler.menu(chatId, user.getLanguage()));
             return messages;
 

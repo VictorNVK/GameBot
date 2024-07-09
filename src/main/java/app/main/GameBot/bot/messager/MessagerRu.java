@@ -53,4 +53,5 @@ public class MessagerRu extends Messager {
     private final String yourItemFind = "Вы нашли предмет: ";
     private final String chooseLocationToChange = "Выберите локацию для исследования :";
     private final String location_has_been_chosen = "Локация была выбрана, выберите действие";
+    private final String start_location = "Стартовая локация - Поляна\uD83D\uDFE2";
 }
