@@ -23,7 +23,7 @@ public class MessagerRu extends Messager {
     private final String changeLocationMenu = "Выберите пункт в меню смна локации\uD83D\uDD04";
 
     private final String characteristics = "Харрактеристики";
-    private final String talents = "Таланты(В разработке\uD83D\uDEE0)";
+    private final String talents = "Таланты";
     private final String back = "Назад❌";
     private final String inDev = "Эта функция находиться в разработке\uD83D\uDEE0";
 
@@ -54,4 +54,12 @@ public class MessagerRu extends Messager {
     private final String chooseLocationToChange = "Выберите локацию для исследования :";
     private final String location_has_been_chosen = "Локация была выбрана, выберите действие";
     private final String start_location = "Стартовая локация - Поляна\uD83D\uDFE2";
+    private final String training = "Тренировка\uD83D\uDCAA";
+    private final String choose_param_of_menu = "Выберите пункт меню :";
+    private final String prof = "Проффесии" ;
+    private final String your_talent_stats = "Текущие харрактеристики вашего таланта : ";
+    private final String your_balance = "Ваш баланс кристаллов : ";
+    private final String train_up = "Тренировать";
+    private final String little_crystals = "Недостаточно кристалов❌\uD83D\uDC8E";
+
 }

@@ -6,10 +6,15 @@ import app.main.GameBot.bot.messager.MessagerEn;
 import app.main.GameBot.bot.messager.MessagerRu;
 import app.main.GameBot.models.Player;
 import app.main.GameBot.models.User;
+import app.main.GameBot.repositories.PlayerRepository;
+import app.main.GameBot.repositories.TalentRepository;
 import app.main.GameBot.states.Location;
+import app.main.GameBot.talent.Talent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -19,6 +24,8 @@ public class PlayerHandler {
 
     private Messager messager;
     private final PlayerKeyboard playerKeyboard;
+    private final TalentRepository talentRepository;
+    private final PlayerRepository playerRepository;
 
     private void choose_lang(String lang) {
         if (lang.startsWith("rus")) {
@@ -42,6 +49,7 @@ public class PlayerHandler {
         player.setEnergyRegeneration(1);
         player.setBloodRegeneration(1);
         player.setLocation(Location.CLEARING);
+        player.setCrystals(50);
         return player;
     }
 
@@ -65,11 +73,90 @@ public class PlayerHandler {
         +"\n" + messager.getBlood() + player.getBlood() + "\uD83E\uDE78"
                 +"\n" + messager.getAttack() + player.getAttack() + "\uD83D\uDDE1"
         +"\n" +messager.getDefense() + player.getDefense() + "\uD83D\uDEE1"
-        +"\n" + messager.getHealthRegeneration() + player.getHealthRegeneration()
+        /*+"\n" + messager.getHealthRegeneration() + player.getHealthRegeneration()
         +"\n" + messager.getEnergyRegeneration() + player.getEnergyRegeneration()
-        +"\n" + messager.getBloodRegeneration() + player.getBloodRegeneration());
+        +"\n" + messager.getBloodRegeneration() + player.getBloodRegeneration()*/
+        );
 
         sendMessage.setReplyMarkup(playerKeyboard.characteristics_keyboard(lang));
+        return sendMessage;
+    }
+    public SendMessage train_menu(Long chatId, String lang){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getChoose_param_of_menu());
+        sendMessage.setReplyMarkup(playerKeyboard.train_menu(lang));
+        return sendMessage;
+    }
+    public SendMessage talents_list(Long chatId, String lang, List<Talent> talents){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getChoose_param_of_menu());
+        sendMessage.setReplyMarkup(playerKeyboard.talents_list(talents, lang));
+        return sendMessage;
+    }
+    public SendMessage your_talent_stats(Talent talent, Long chatId, String lang, Player player){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        app.main.GameBot.models.Talent talentModel = null;
+        if(talentRepository.findTalentByPlayerAndName(player, talent.getNameEn()) == null) {
+             talentModel = new app.main.GameBot.models.Talent();
+
+        }else {
+            talentModel = talentRepository.findTalentByPlayerAndName(player, talent.getNameEn());
+        }
+        talentModel.setPlayer(player);
+        talentModel.setName(talent.getNameEn());
+        talentModel.setLevel(talentModel.getLevel());
+
+        talentRepository.save(talentModel);
+        player.setLastTalent(talent.getNameEn());
+        playerRepository.save(player);
+
+        var text = messager.getYour_talent_stats() + "\n\n";
+        if(lang.equals("rus")){
+            text = text + talent.descriptionRu(talentModel);
+        }else if(lang.equals("eng")){
+            text = text + talent.descriptionEn(talentModel);
+        }
+        sendMessage.setText(text);
+        sendMessage.setReplyMarkup(playerKeyboard.up_talent_menu(lang, player));
+
+        return sendMessage;
+    }
+    public SendMessage your_balance(Long chatId, String lang, Integer balance){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getYour_balance() + balance + "\uD83D\uDC8E" );
+        return sendMessage;
+    }
+    public SendMessage talent_up(Long chatId, String lang, String talent_name, Player player, Talent _talent){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        var talent = talentRepository.findTalentByPlayerAndName(player, talent_name);
+
+            var crystal_count = 25;
+            for(int i = 0; i< talent.getLevel(); i++){
+                crystal_count = crystal_count * 2;
+            }
+            if(player.getCrystals() >= crystal_count) {
+                talent.setLevel(talent.getLevel() + 1);
+                talentRepository.save(talent);
+                player.setCrystals(player.getCrystals() - crystal_count);
+                playerRepository.save(player);
+                if(lang.equals("rus")){
+                    sendMessage.setText(_talent.descriptionRu(talent));
+                }else if(lang.equals("eng")) {
+                    sendMessage.setText(_talent.descriptionEn(talent));
+                }
+            }else{
+                sendMessage.setText(messager.getLittle_crystals());
+            }
         return sendMessage;
     }
 }

@@ -54,4 +54,10 @@ public class Player {
 
     @Column
     private Integer BloodRegeneration;
+
+    @Column
+    private Integer crystals;
+
+    @Column
+    private String lastTalent;
 }

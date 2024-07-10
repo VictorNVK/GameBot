@@ -9,6 +9,8 @@ import app.main.GameBot.models.User;
 import app.main.GameBot.other.Logger;
 import app.main.GameBot.repositories.ItemRepository;
 import app.main.GameBot.states.Location;
+import app.main.GameBot.talent.Talent;
+import app.main.GameBot.talent.TalentsInit;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -31,6 +33,7 @@ public class PlayerService {
     private final LocationHandler locationHandler;
     private User _user;
     private Player _player;
+    private final TalentsInit talentsInit;
 
 
     public List<BotApiMethodMessage> callback_menu_handle(Update update, User user, Player player){
@@ -53,12 +56,23 @@ public class PlayerService {
                     "харрактеристика");
             return messages;
         }
-        if (callback.startsWith("talents")) {
-            messages.add(menuHandler.in_dev(chatId, user.getLanguage()));
+
+        if(callback.startsWith("training")){
+            messages.add(playerHandler.train_menu(chatId, user.getLanguage()));
             logger.log(player.getNickname(), user.getId(), "выбрал пункт меню персонажа",
-                    "таланты");
+                    "тренировка");
             return messages;
         }
+        /**/
+        if(callback.startsWith("talents_up")){
+            messages.add(playerHandler.talents_list(chatId, user.getLanguage(), talentsInit.getTalents()));
+            return messages;
+        }
+        if(callback.startsWith("prof_up")){
+            messages.add(menuHandler.in_dev(chatId, user.getLanguage()));
+            return messages;
+        }
+        /**/
         if (callback.startsWith("inventory")) {
             messages.add(inventoryHandler.inventory_menu(chatId, user.getLanguage()));
             logger.log(player.getNickname(), user.getId(), "выбрал пункт меню",
@@ -116,11 +130,30 @@ public class PlayerService {
                     "Пригород");
             return messages;
         }
-
         if (callback.startsWith("back")) {
             messages.add(menuHandler.menu(chatId, user.getLanguage()));
             return messages;
         }
+        if(talentsInit.getTalents().contains(searchTalent(callback))){
+            messages.add(playerHandler.your_talent_stats(searchTalent(callback), chatId, user.getLanguage(), player));
+            messages.add(playerHandler.your_balance(chatId, user.getLanguage(), player.getCrystals()));
+            return messages;
+        }
+        if(callback.startsWith("up_")){
+            callback = callback.substring(3);
+            messages.add(playerHandler.talent_up(chatId, user.getLanguage(), callback, player, searchTalent(callback)));
+            messages.add(playerHandler.your_balance(chatId, user.getLanguage(), player.getCrystals()));
+        }
         return messages;
     }
+    private Talent searchTalent(String callback){
+        List<Talent> talents = talentsInit.getTalents();
+        for(Talent talent : talents){
+            if(talent.getNameEn().equals(callback)){
+                return talent;
+            }
+        }
+        return null;
+    }
+
 }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 @Getter
 @Setter
-public class Location {
+public abstract class Location {
 
     private String nameRu;
 

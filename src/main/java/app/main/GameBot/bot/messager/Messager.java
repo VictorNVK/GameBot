@@ -52,4 +52,13 @@ public abstract class Messager {
     private String chooseLocationToChange;
     private String location_has_been_chosen;
     private String start_location;
+    private String training;
+    private String choose_param_of_menu;
+    private String prof;
+    private String your_talent_stats;
+    private String your_balance;
+    private String train_up;
+    private String little_crystals;
+
+
 }
