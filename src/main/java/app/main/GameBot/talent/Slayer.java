@@ -26,8 +26,13 @@ public class Slayer extends Talent {
 
     public String descriptionRu(app.main.GameBot.models.Talent talent){
         var level = talent.getLevel();
-        var damage = level * 2;
-        var energy = 5 * level;
+        var damage = 2 + (level * 1);
+        var energy = 5;
+        if(level >=2 && level % 2 == 0) {
+            energy = energy + level /2;
+        }else {
+            energy = energy + level/2;
+        }
         return "Разрез: атака +"+ damage + ", расход " + energy + " энергии";
     }
     public String descriptionEn(app.main.GameBot.models.Talent talent){

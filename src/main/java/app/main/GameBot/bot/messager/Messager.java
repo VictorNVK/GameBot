@@ -59,6 +59,8 @@ public abstract class Messager {
     private String your_balance;
     private String train_up;
     private String little_crystals;
+    private String talent_is_maxed;
+    private String barrier;
 
 
 }

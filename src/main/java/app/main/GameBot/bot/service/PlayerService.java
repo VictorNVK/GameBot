@@ -11,6 +11,7 @@ import app.main.GameBot.repositories.ItemRepository;
 import app.main.GameBot.states.Location;
 import app.main.GameBot.talent.Talent;
 import app.main.GameBot.talent.TalentsInit;
+import app.main.GameBot.way.Way;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -64,10 +65,7 @@ public class PlayerService {
             return messages;
         }
         /**/
-        if(callback.startsWith("talents_up")){
-            messages.add(playerHandler.talents_list(chatId, user.getLanguage(), talentsInit.getTalents()));
-            return messages;
-        }
+
         if(callback.startsWith("prof_up")){
             messages.add(menuHandler.in_dev(chatId, user.getLanguage()));
             return messages;
@@ -130,30 +128,51 @@ public class PlayerService {
                     "Пригород");
             return messages;
         }
+        if(callback.startsWith("talents_up")){
+            messages.add(playerHandler.ways_list(chatId, user.getLanguage(), talentsInit.getWaysList()));
+            return messages;
+        }
         if (callback.startsWith("back")) {
             messages.add(menuHandler.menu(chatId, user.getLanguage()));
             return messages;
         }
-        if(talentsInit.getTalents().contains(searchTalent(callback))){
-            messages.add(playerHandler.your_talent_stats(searchTalent(callback), chatId, user.getLanguage(), player));
-            messages.add(playerHandler.your_balance(chatId, user.getLanguage(), player.getCrystals()));
+        if(talentsInit.getWaysList().contains(searchWay(callback))){
+            messages.add(playerHandler.talents_list(chatId, user.getLanguage(), searchWay(callback).getTalents(),
+                    searchWay(callback), player));
             return messages;
         }
         if(callback.startsWith("up_")){
             callback = callback.substring(3);
-            messages.add(playerHandler.talent_up(chatId, user.getLanguage(), callback, player, searchTalent(callback)));
+            messages.add(playerHandler.talent_up(chatId, user.getLanguage(), callback, player,
+                    searchTalent(callback), talentsInit.getWaysList()));
             messages.add(playerHandler.your_balance(chatId, user.getLanguage(), player.getCrystals()));
+            return messages;
+        }
+        if(searchTalent(callback) != null){
+            messages.add(playerHandler.your_talent_stats(searchTalent(callback), chatId, user.getLanguage(), player));
+            messages.add(playerHandler.your_balance(chatId, user.getLanguage(), player.getCrystals()));
+            return messages;
         }
         return messages;
     }
     private Talent searchTalent(String callback){
-        List<Talent> talents = talentsInit.getTalents();
-        for(Talent talent : talents){
-            if(talent.getNameEn().equals(callback)){
-                return talent;
+        List<Way> ways = talentsInit.getWaysList();
+        for(Way way : ways){
+            for(Talent talent:way.getTalents()){
+                if(talent.getNameEn().equals(callback)){
+                    return talent;
+                }
             }
         }
         return null;
     }
-
+    private Way searchWay(String callback){
+        List<Way> ways = talentsInit.getWaysList();
+        for(Way way : ways){
+            if(way.getNameEn().equals(callback)){
+                return way;
+            }
+        }
+        return null;
+    }
 }

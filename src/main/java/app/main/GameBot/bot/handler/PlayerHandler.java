@@ -10,6 +10,7 @@ import app.main.GameBot.repositories.PlayerRepository;
 import app.main.GameBot.repositories.TalentRepository;
 import app.main.GameBot.states.Location;
 import app.main.GameBot.talent.Talent;
+import app.main.GameBot.way.Way;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -45,6 +46,7 @@ public class PlayerHandler {
         player.setBlood(5);
         player.setAttack(1);
         player.setDefense(0);
+        player.setBarrier(0);
         player.setHealthRegeneration(1);
         player.setEnergyRegeneration(1);
         player.setBloodRegeneration(1);
@@ -73,6 +75,7 @@ public class PlayerHandler {
         +"\n" + messager.getBlood() + player.getBlood() + "\uD83E\uDE78"
                 +"\n" + messager.getAttack() + player.getAttack() + "\uD83D\uDDE1"
         +"\n" +messager.getDefense() + player.getDefense() + "\uD83D\uDEE1"
+                        +"\n" +messager.getBarrier() + player.getBarrier() + "\uD83D\uDD35"
         /*+"\n" + messager.getHealthRegeneration() + player.getHealthRegeneration()
         +"\n" + messager.getEnergyRegeneration() + player.getEnergyRegeneration()
         +"\n" + messager.getBloodRegeneration() + player.getBloodRegeneration()*/
@@ -89,12 +92,14 @@ public class PlayerHandler {
         sendMessage.setReplyMarkup(playerKeyboard.train_menu(lang));
         return sendMessage;
     }
-    public SendMessage talents_list(Long chatId, String lang, List<Talent> talents){
+    public SendMessage talents_list(Long chatId, String lang, List<Talent> talents, Way way, Player player){
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(messager.getChoose_param_of_menu());
         sendMessage.setReplyMarkup(playerKeyboard.talents_list(talents, lang));
+        player.setLastBranch(way.getNameEn());
+        playerRepository.save(player);
         return sendMessage;
     }
     public SendMessage your_talent_stats(Talent talent, Long chatId, String lang, Player player){
@@ -134,29 +139,61 @@ public class PlayerHandler {
         sendMessage.setText(messager.getYour_balance() + balance + "\uD83D\uDC8E" );
         return sendMessage;
     }
-    public SendMessage talent_up(Long chatId, String lang, String talent_name, Player player, Talent _talent){
+    public SendMessage talent_up(Long chatId, String lang, String talent_name, Player player, Talent _talent,
+                                 List<Way> ways){
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         var talent = talentRepository.findTalentByPlayerAndName(player, talent_name);
 
+        if(talent.getLevel() >= 20){
+            sendMessage.setText(messager.getTalent_is_maxed());
+            return sendMessage;
+        }
             var crystal_count = 25;
             for(int i = 0; i< talent.getLevel(); i++){
-                crystal_count = crystal_count * 2;
+                crystal_count = crystal_count +25;
             }
             if(player.getCrystals() >= crystal_count) {
                 talent.setLevel(talent.getLevel() + 1);
                 talentRepository.save(talent);
                 player.setCrystals(player.getCrystals() - crystal_count);
-                playerRepository.save(player);
                 if(lang.equals("rus")){
                     sendMessage.setText(_talent.descriptionRu(talent));
                 }else if(lang.equals("eng")) {
                     sendMessage.setText(_talent.descriptionEn(talent));
                 }
+                var way = searchWay(talent.getName(), ways);
+                if(way != null){
+                    var way_name = way.getNameEn();
+                    if(way_name.equals("Sword way")){
+                        player.setHealth(player.getHealth() + 10);
+                    }
+                    /*Место для раскачки ветки*/
+                }
+                playerRepository.save(player);
             }else{
                 sendMessage.setText(messager.getLittle_crystals());
             }
         return sendMessage;
+    }
+    public SendMessage ways_list(Long chatId, String lang, List<Way> ways){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getChoose_param_of_menu());
+        sendMessage.setReplyMarkup(playerKeyboard.waysList_list(ways, lang));
+        return sendMessage;
+    }
+
+    private Way searchWay(String _talent, List<Way> ways){
+        for(Way way : ways){
+            for(Talent talent: way.getTalents()){
+                if(talent.getNameEn().equals(_talent)){
+                    return way;
+                }
+            }
+        }
+        return null;
     }
 }

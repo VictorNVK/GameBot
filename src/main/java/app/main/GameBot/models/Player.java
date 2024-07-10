@@ -29,6 +29,9 @@ public class Player {
     private Integer level;
 
     @Column
+    private Integer barrier;
+
+    @Column
     private Integer health;
 
     @Column
@@ -60,4 +63,7 @@ public class Player {
 
     @Column
     private String lastTalent;
+
+    @Column
+    private String lastBranch;
 }

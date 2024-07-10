@@ -61,5 +61,7 @@ public class MessagerRu extends Messager {
     private final String your_balance = "Ваш баланс кристаллов : ";
     private final String train_up = "Тренировать";
     private final String little_crystals = "Недостаточно кристалов❌\uD83D\uDC8E";
+    private final String talent_is_maxed = "Этот навык улчушен до максимального уровня✅";
+    private final String barrier = "Барьер : ";
 
 }

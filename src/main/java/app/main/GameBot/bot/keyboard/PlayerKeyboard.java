@@ -2,6 +2,7 @@ package app.main.GameBot.bot.keyboard;
 
 import app.main.GameBot.models.Player;
 import app.main.GameBot.talent.Talent;
+import app.main.GameBot.way.Way;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -118,4 +119,24 @@ public class PlayerKeyboard extends Keyboard {
         keyboardMarkup.setKeyboard(rows);
         return keyboardMarkup;
     }
+    public InlineKeyboardMarkup waysList_list(List<Way> ways, String lang){
+        choose_lang(lang);
+        var keyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        for(int i = 0; i < ways.size(); i ++){
+            List<InlineKeyboardButton> row1 = new ArrayList<>();
+            var button1 = new InlineKeyboardButton();
+            if(lang.equals("rus")) {
+                button1.setText(ways.get(i).getNameRu());
+            }else if(lang.equals("eng")) {
+                button1.setText(ways.get(i).getNameEn());
+            }
+            button1.setCallbackData(ways.get(i).getNameEn());
+            row1.add(button1);
+            rows.add(row1);
+        }
+        keyboardMarkup.setKeyboard(rows);
+        return keyboardMarkup;
+    }
+
 }
