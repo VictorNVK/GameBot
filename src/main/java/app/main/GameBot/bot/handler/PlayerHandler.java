@@ -40,16 +40,6 @@ public class PlayerHandler {
         var player = new Player();
         player.setId(user.getId());
         player.setNickname(name);
-        player.setLevel(0);
-        player.setHealth(20);
-        player.setEnergy(10);
-        player.setBlood(5);
-        player.setAttack(1);
-        player.setDefense(0);
-        player.setBarrier(0);
-        player.setHealthRegeneration(1);
-        player.setEnergyRegeneration(1);
-        player.setBloodRegeneration(1);
         player.setLocation(Location.CLEARING);
         player.setCrystals(50);
         return player;

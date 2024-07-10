@@ -26,37 +26,37 @@ public class Player {
     private Location location;
 
     @Column
-    private Integer level;
+    private Integer level = 0;
 
     @Column
-    private Integer barrier;
+    private Integer barrier = 0;
 
     @Column
-    private Integer health;
+    private Integer health = 20;
 
     @Column
-    private Integer energy;
+    private Integer energy = 10;
 
     @Column
-    private Integer blood;
+    private Integer blood = 5;
 
     @Column
-    private Integer attack;
+    private Integer attack = 1;
 
     @Column
-    private Integer defense;
+    private Integer defense = 0;
 
     @Column
     private Integer room;
 
     @Column
-    private Integer HealthRegeneration;
+    private Integer HealthRegeneration = 1;
 
     @Column
-    private Integer EnergyRegeneration;
+    private Integer EnergyRegeneration = 1;
 
     @Column
-    private Integer BloodRegeneration;
+    private Integer BloodRegeneration = 1;
 
     @Column
     private Integer crystals;
