@@ -28,7 +28,7 @@ public class MessagerRu extends Messager {
     private final String inDev = "Эта функция находиться в разработке\uD83D\uDEE0";
 
     private final String health = "Здоровье: ";
-    private final String energy = "Энергий: ";
+    private final String energy = "Энергия: ";
     private final String blood = "Кровь: ";
     private final String attack ="Атака: ";
     private final String defense= "Защита: ";
@@ -63,5 +63,9 @@ public class MessagerRu extends Messager {
     private final String little_crystals = "Недостаточно кристалов❌\uD83D\uDC8E";
     private final String talent_is_maxed = "Этот навык улчушен до максимального уровня✅";
     private final String barrier = "Барьер : ";
+    private final String up_time = "Прокачка навыка займёт: ";
+    private final String await_up = "ожидайте\uD83D\uDD58";
+    private final String second = "секунд";
+    private final String up_is_delete = "Улучшение было отменено!";
 
 }

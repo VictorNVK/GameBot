@@ -15,6 +15,9 @@ import app.main.GameBot.repositories.PlayerRepository;
 import app.main.GameBot.repositories.UserRepository;
 import app.main.GameBot.states.Location;
 import app.main.GameBot.states.UserState;
+import app.main.GameBot.talent.Talent;
+import app.main.GameBot.talent.TalentsInit;
+import app.main.GameBot.way.Way;
 import lombok.SneakyThrows;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -42,13 +45,15 @@ public class GameBot extends TelegramLongPollingBot {
     private final Logger logger;
     private final MenuService menuService;
     private final PlayerService playerService;
+    private final PlayerHandler playerHandler;
+    private final TalentsInit talentsInit;
 
     private List<User> users = new ArrayList<>();
     private Map<Long, User> userMap = new HashMap<>();
 
     public GameBot(BotConfig botConfig,
                    LocationHandler locationHandler,
-                   PlayerRepository playerRepository,UserRepository userRepository, Logger logger, MenuService menuService, PlayerService playerService) {
+                   PlayerRepository playerRepository, UserRepository userRepository, Logger logger, MenuService menuService, PlayerService playerService, PlayerHandler playerHandler, TalentsInit talentsInit) {
         this.botConfig = botConfig;
         this.locationHandler = locationHandler;
         this.playerRepository = playerRepository;
@@ -56,6 +61,8 @@ public class GameBot extends TelegramLongPollingBot {
         this.logger = logger;
         this.menuService = menuService;
         this.playerService = playerService;
+        this.playerHandler = playerHandler;
+        this.talentsInit = talentsInit;
     }
 
     @Override
@@ -110,6 +117,7 @@ public class GameBot extends TelegramLongPollingBot {
             updateUser(menuService.get_user());
             sendMessages(messages);
         }
+
         /*ToDo*/
     }
 
@@ -120,6 +128,7 @@ public class GameBot extends TelegramLongPollingBot {
 
         var callback = update.getCallbackQuery().getData();
         var chatId = update.getCallbackQuery().getFrom().getId();
+
 
         if (user.getUserState() == null) {
             sendMessages(menuService.callback_menu_handle(update, user));
@@ -161,7 +170,11 @@ public class GameBot extends TelegramLongPollingBot {
             updateUser(menuService.get_user());
             sendMessages(messages);
         }
-        /*ToDo*/
+        if(user.getUserState().equals(UserState.GRADE)){
+            List<BotApiMethodMessage> messages = menuService.callback_menu_handle(update, user);
+            updateUser(menuService.get_user());
+            sendMessages(messages);
+        }
     }
 
     @Override
@@ -187,5 +200,16 @@ public class GameBot extends TelegramLongPollingBot {
                 execute(botApiMethodMessage);
             }
         }
+    }
+    private Talent searchTalent(String callback){
+        List<Way> ways = talentsInit.getWaysList();
+        for(Way way : ways){
+            for(Talent talent:way.getTalents()){
+                if(talent.getNameEn().equals(callback)){
+                    return talent;
+                }
+            }
+        }
+        return null;
     }
 }

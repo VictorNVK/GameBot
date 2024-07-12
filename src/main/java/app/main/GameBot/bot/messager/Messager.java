@@ -61,6 +61,10 @@ public abstract class Messager {
     private String little_crystals;
     private String talent_is_maxed;
     private String barrier;
+    private String up_time;
+    private String await_up;
+    private String second;
+    private String up_is_delete;
 
 
 }

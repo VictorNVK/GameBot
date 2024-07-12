@@ -12,6 +12,7 @@ import app.main.GameBot.other.Logger;
 import app.main.GameBot.repositories.ItemRepository;
 import app.main.GameBot.repositories.PlayerRepository;
 import app.main.GameBot.repositories.UserRepository;
+import app.main.GameBot.talent.TalentsInit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -34,6 +35,7 @@ public class Initialization {
     private final UserRepository userRepository;
     private final MenuService menuService;
     private final PlayerService playerService;
+    private final TalentsInit talentsInit;
 
     @EventListener(ContextRefreshedEvent.class)
     public void init() {
@@ -41,7 +43,7 @@ public class Initialization {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
             botsApi.registerBot(new GameBot(botConfig, locationHandler,
                     playerRepository, userRepository, logger, menuService
-            ,playerService));
+            ,playerService, playerHandler, talentsInit));
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

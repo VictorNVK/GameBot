@@ -3,15 +3,13 @@ package app.main.GameBot.talent;
 import app.main.GameBot.enemy.Enemy;
 import app.main.GameBot.models.Player;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
-public class Slayer extends Talent {
+public class MagicShot extends Talent {
 
-    private final String nameRu = "Разрез";
+    private final String nameRu = "Стихийный удар";
 
-    private final String nameEn = "Slayer";
+    private final String nameEn = "Elemental Strike";
 
     private final String type = "attack";
 
@@ -36,12 +34,13 @@ public class Slayer extends Talent {
         }else {
             energy = energy + level/2;
         }
-        return "Разрез: атака +"+ damage + ", расход " + energy + " энергии⚡\uFE0F";
+        return "Стихийный удар: атака +"+ damage + ", расход " + energy + " энергии⚡\uFE0F";
     }
     public String descriptionEn(app.main.GameBot.models.Talent talent){
         var level = talent.getLevel();
         var damage = level * 2;
         var energy = 5 * level;
-        return "\"Slay: attack +\"+ damage + \", consumption\" + energy + \"energy\";";
+        return "Elemental strike: attack +\"+ damage + \", consumption\" + energy + \"energy\";";
     }
+
 }

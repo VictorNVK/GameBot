@@ -8,7 +8,9 @@ import app.main.GameBot.models.Player;
 import app.main.GameBot.models.User;
 import app.main.GameBot.other.Logger;
 import app.main.GameBot.repositories.ItemRepository;
+import app.main.GameBot.repositories.UserRepository;
 import app.main.GameBot.states.Location;
+import app.main.GameBot.states.UserState;
 import app.main.GameBot.talent.Talent;
 import app.main.GameBot.talent.TalentsInit;
 import app.main.GameBot.way.Way;
@@ -35,6 +37,7 @@ public class PlayerService {
     private User _user;
     private Player _player;
     private final TalentsInit talentsInit;
+    private final UserRepository userRepository;
 
 
     public List<BotApiMethodMessage> callback_menu_handle(Update update, User user, Player player){
@@ -143,9 +146,10 @@ public class PlayerService {
         }
         if(callback.startsWith("up_")){
             callback = callback.substring(3);
-            messages.add(playerHandler.talent_up(chatId, user.getLanguage(), callback, player,
-                    searchTalent(callback), talentsInit.getWaysList()));
+            messages.add(playerHandler.talent_up_info(chatId, user.getLanguage(), player, callback));
             messages.add(playerHandler.your_balance(chatId, user.getLanguage(), player.getCrystals()));
+            user.setUserState(UserState.GRADE);
+            userRepository.save(user);
             return messages;
         }
         if(searchTalent(callback) != null){

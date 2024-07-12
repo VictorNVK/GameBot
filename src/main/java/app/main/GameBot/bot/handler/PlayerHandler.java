@@ -5,17 +5,23 @@ import app.main.GameBot.bot.messager.Messager;
 import app.main.GameBot.bot.messager.MessagerEn;
 import app.main.GameBot.bot.messager.MessagerRu;
 import app.main.GameBot.models.Player;
+import app.main.GameBot.models.UpgradeProgress;
 import app.main.GameBot.models.User;
 import app.main.GameBot.repositories.PlayerRepository;
 import app.main.GameBot.repositories.TalentRepository;
+import app.main.GameBot.repositories.UpgradeProgressRepository;
+import app.main.GameBot.repositories.UserRepository;
 import app.main.GameBot.states.Location;
 import app.main.GameBot.talent.Talent;
 import app.main.GameBot.way.Way;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -27,6 +33,8 @@ public class PlayerHandler {
     private final PlayerKeyboard playerKeyboard;
     private final TalentRepository talentRepository;
     private final PlayerRepository playerRepository;
+    private final UpgradeProgressRepository upgradeProgressRepository;
+    private final UserRepository userRepository;
 
     private void choose_lang(String lang) {
         if (lang.startsWith("rus")) {
@@ -71,7 +79,7 @@ public class PlayerHandler {
         +"\n" + messager.getBloodRegeneration() + player.getBloodRegeneration()*/
         );
 
-        sendMessage.setReplyMarkup(playerKeyboard.characteristics_keyboard(lang));
+        sendMessage.setReplyMarkup(playerKeyboard.back_keyboard(lang));
         return sendMessage;
     }
     public SendMessage train_menu(Long chatId, String lang){
@@ -144,10 +152,8 @@ public class PlayerHandler {
             for(int i = 0; i< talent.getLevel(); i++){
                 crystal_count = crystal_count +25;
             }
-            if(player.getCrystals() >= crystal_count) {
                 talent.setLevel(talent.getLevel() + 1);
                 talentRepository.save(talent);
-                player.setCrystals(player.getCrystals() - crystal_count);
                 if(lang.equals("rus")){
                     sendMessage.setText(_talent.descriptionRu(talent));
                 }else if(lang.equals("eng")) {
@@ -158,15 +164,72 @@ public class PlayerHandler {
                     var way_name = way.getNameEn();
                     if(way_name.equals("Sword way")){
                         player.setHealth(player.getHealth() + 10);
+
+                    }else if(way_name.equals("Magus way")){
+                        player.setEnergy(player.getEnergy() + 10);
                     }
+                    else if(way_name.equals("Word way")){
+                        player.setEnergy(player.getEnergy() + 5);
+                        player.setBarrier(player.getBarrier() +3);
+                    }
+                    playerRepository.save(player);
                     /*Место для раскачки ветки*/
                 }
-                playerRepository.save(player);
-            }else{
-                sendMessage.setText(messager.getLittle_crystals());
-            }
         return sendMessage;
     }
+
+    public SendMessage talent_up_info(Long chatId, String lang, Player player, String talent_name){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        var talent = talentRepository.findTalentByPlayerAndName(player, talent_name);
+
+        if(talent.getLevel() >= 20){
+            sendMessage.setText(messager.getTalent_is_maxed());
+            return sendMessage;
+        }
+        var crystal_count = 25;
+        for(int i = 0; i< talent.getLevel(); i++){
+            crystal_count = crystal_count +25;
+        }
+        var time = crystal_count * 5;
+
+        if(player.getCrystals() >= crystal_count) {
+            player.setCrystals(player.getCrystals() - crystal_count);
+
+            UpgradeProgress upgradeProgress = new UpgradeProgress();
+            upgradeProgress.setTalent(talent);
+
+            Date date = new Date();
+            var newDate = date.getTime() + TimeUnit.SECONDS.toMillis(time);
+            var up_time = new Date(newDate);
+            upgradeProgress.setTime(up_time);
+            upgradeProgress.setPrice(crystal_count);
+            upgradeProgress.setPlayer(player);
+            upgradeProgressRepository.save(upgradeProgress);
+            sendMessage.setText(messager.getUp_time() + time + " " + messager.getSecond() + " , " + messager.getAwait_up());
+            playerRepository.save(player);
+            sendMessage.setReplyMarkup(playerKeyboard.back_keyboard(lang));
+        }else {
+            sendMessage.setText(messager.getLittle_crystals());
+        }
+        return sendMessage;
+    }
+
+    @Transactional
+    public SendMessage back_up(Long chatId, String lang, Player player){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        UpgradeProgress upgradeProgress = upgradeProgressRepository.findUpgradeProgressByPlayer(player);
+        var price = upgradeProgress.getPrice();
+        player.setCrystals(player.getCrystals() + price);
+        playerRepository.save(player);
+        upgradeProgressRepository.delete(upgradeProgress);
+        sendMessage.setText(messager.getUp_is_delete());
+        return sendMessage;
+    }
+
     public SendMessage ways_list(Long chatId, String lang, List<Way> ways){
         choose_lang(lang);
         var sendMessage = new SendMessage();

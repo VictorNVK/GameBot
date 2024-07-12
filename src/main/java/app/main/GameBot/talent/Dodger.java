@@ -12,11 +12,18 @@ public class Dodger extends Talent{
 
     private String nameEn = "Dodger";
 
-    private void action_attack(Enemy enemy, Player player, app.main.GameBot.models.Talent talent){
+    private final String type = "defense";
+
+    private final Integer active_time = 99999;
+
+    private final Integer unlocked_way_level = 1;
+
+
+    public void action_attack(Enemy enemy, Player player, app.main.GameBot.models.Talent talent){
 
     }
 
-    private void action_defense(){
+    public void action_defense(){
 
     }
 

@@ -32,7 +32,24 @@ public class TalentsInit {
 
         way.setTalents(sword_way);
 
+        Way way2 = new Way();
+        way2.setNameRu("Путь мага");
+        way2.setNameEn("Magus way");
+        MagicShot magicShot = new MagicShot();
+        WeakBarrier weakBarrier = new WeakBarrier();
+        magic_way.add(magicShot);
+        magic_way.add(weakBarrier);
+        way2.setTalents(magic_way);
+
+        Way way3 = new Way();
+        way3.setNameRu("Путь слова");
+        way3.setNameEn("Word way");
+        Suppression suppression = new Suppression();
+
+        word_way.add(suppression);
 
         waysList.add(way);
+        waysList.add(way2);
+        waysList.add(way3);
     }
 }

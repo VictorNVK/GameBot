@@ -4,7 +4,6 @@ import app.main.GameBot.models.Player;
 import app.main.GameBot.talent.Talent;
 import app.main.GameBot.way.Way;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
@@ -39,7 +38,7 @@ public class PlayerKeyboard extends Keyboard {
         keyboardMarkup.setKeyboard(rows);
         return keyboardMarkup;
     }
-    public InlineKeyboardMarkup characteristics_keyboard(String lang){
+    public InlineKeyboardMarkup back_keyboard(String lang){
         choose_lang(lang);
         var keyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
@@ -138,5 +137,7 @@ public class PlayerKeyboard extends Keyboard {
         keyboardMarkup.setKeyboard(rows);
         return keyboardMarkup;
     }
+
+
 
 }

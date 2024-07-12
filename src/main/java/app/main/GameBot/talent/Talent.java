@@ -11,11 +11,16 @@ public abstract class Talent {
 
     private String nameEn;
 
+    private String type;
 
-    private void action_attack(){
+    private Integer active_time;
+    private Integer unlocked_way_level;
+
+
+    public void action_attack(){
 
     }
-    private void action_defense(){
+    public void action_defense(){
 
     }
     public String descriptionRu(app.main.GameBot.models.Talent talent){

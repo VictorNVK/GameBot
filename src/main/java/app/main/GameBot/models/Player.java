@@ -26,7 +26,7 @@ public class Player {
     private Location location;
 
     @Column
-    private Integer level = 0;
+    private Integer level = 1;
 
     @Column
     private Integer barrier = 0;

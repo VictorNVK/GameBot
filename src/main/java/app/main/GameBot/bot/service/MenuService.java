@@ -7,6 +7,7 @@ import app.main.GameBot.models.Player;
 import app.main.GameBot.models.User;
 import app.main.GameBot.other.Logger;
 import app.main.GameBot.repositories.PlayerRepository;
+import app.main.GameBot.repositories.UserRepository;
 import app.main.GameBot.states.UserState;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class MenuService {
     private final PlayerRepository playerRepository;
     private final PlayerHandler playerHandler;
     private final LocationHandler locationHandler;
+    private final UserRepository userRepository;
     private User _user;
     private Player _player;
 
@@ -58,6 +60,7 @@ public class MenuService {
     public List<BotApiMethodMessage> callback_menu_handle(Update update, User user){
 
         this._user = user;
+        Player player = playerRepository.findPlayerById(user.getId());
         List<BotApiMethodMessage> messages = new ArrayList<>();
         var callback = update.getCallbackQuery().getData();
         var chatId = update.getCallbackQuery().getFrom().getId();
@@ -81,6 +84,12 @@ public class MenuService {
             messages.add(menuHandler.menu(chatId, user.getLanguage()));
             return messages;
 
+        }
+        if(callback.startsWith("back")){
+            user.setUserState(UserState.MENU);
+            messages.add(playerHandler.back_up(chatId, user.getLanguage() , player));
+            messages.add(playerHandler.your_balance(chatId, user.getLanguage(), player.getCrystals()));
+            userRepository.save(user);
         }
         return messages;
     }
