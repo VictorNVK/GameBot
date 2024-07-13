@@ -41,14 +41,27 @@ public class GradeTimer {
             if(date.after(upgradeProgress.getTime())){
                 User user = userRepository.findUserById(upgradeProgress.getPlayer().getId());
                 var chatId = user.getChatId();
-                 var sendMessage = playerHandler.talent_up(chatId, user.getLanguage(),
-                        upgradeProgress.getTalent().getName(),
-                        upgradeProgress.getPlayer(),
-                         searchTalent(upgradeProgress.getTalent().getName()), talentsInit.getWaysList());
-                gameBot.execute(sendMessage);
-                upgradeProgressRepository.delete(upgradeProgress);
-                user.setUserState(UserState.MENU);
-                userRepository.save(user);
+                if(upgradeProgress.getTalent() != null) {
+                    var sendMessage = playerHandler.talent_up(chatId, user.getLanguage(),
+                            upgradeProgress.getTalent().getName(),
+                            upgradeProgress.getPlayer(),
+                            searchTalent(upgradeProgress.getTalent().getName()), talentsInit.getWaysList());
+                    gameBot.execute(sendMessage);
+                    user.setUserState(UserState.MENU);
+                    userRepository.save(user);
+                    upgradeProgressRepository.delete(upgradeProgress);
+                    gameBot.execute(playerHandler.character_menu(user.getChatId(), user.getLanguage()));
+
+                }
+                else if(upgradeProgress.getWay() != null){
+                    var sendMessage = playerHandler.branch_up(chatId, user.getLanguage(),
+                            upgradeProgress.getWay());
+                    gameBot.execute(sendMessage);
+                    user.setUserState(UserState.MENU);
+                    userRepository.save(user);
+                    upgradeProgressRepository.delete(upgradeProgress);
+                    gameBot.execute(playerHandler.character_menu(user.getChatId(), user.getLanguage()));
+                }
             }
         }
     }

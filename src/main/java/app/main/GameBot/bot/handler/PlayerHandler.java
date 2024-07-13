@@ -7,10 +7,7 @@ import app.main.GameBot.bot.messager.MessagerRu;
 import app.main.GameBot.models.Player;
 import app.main.GameBot.models.UpgradeProgress;
 import app.main.GameBot.models.User;
-import app.main.GameBot.repositories.PlayerRepository;
-import app.main.GameBot.repositories.TalentRepository;
-import app.main.GameBot.repositories.UpgradeProgressRepository;
-import app.main.GameBot.repositories.UserRepository;
+import app.main.GameBot.repositories.*;
 import app.main.GameBot.states.Location;
 import app.main.GameBot.talent.Talent;
 import app.main.GameBot.way.Way;
@@ -35,6 +32,7 @@ public class PlayerHandler {
     private final PlayerRepository playerRepository;
     private final UpgradeProgressRepository upgradeProgressRepository;
     private final UserRepository userRepository;
+    private final WayRepository wayRepository;
 
     private void choose_lang(String lang) {
         if (lang.startsWith("rus")) {
@@ -94,10 +92,25 @@ public class PlayerHandler {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
+
+        if(wayRepository.findWayByPlayerAndName(player, way.getNameEn()) != null) {
+            var wayModel = wayRepository.findWayByPlayerAndName(player, way.getNameEn());
+            player.setLastBranch(way.getNameEn());
+            playerRepository.save(player);
+            sendMessage.setReplyMarkup(playerKeyboard.talents_list(talents, lang, wayModel));
+
+        }else {
+            var way1 = new app.main.GameBot.models.Way();
+            way1.setName(way.getNameEn());
+            way1.setLevel(0);
+            way1.setPlayer(player);
+            wayRepository.save(way1);
+            sendMessage.setReplyMarkup(playerKeyboard.talents_list(talents, lang, way1));
+        }
+
         sendMessage.setText(messager.getChoose_param_of_menu());
-        sendMessage.setReplyMarkup(playerKeyboard.talents_list(talents, lang));
-        player.setLastBranch(way.getNameEn());
-        playerRepository.save(player);
+
+
         return sendMessage;
     }
     public SendMessage your_talent_stats(Talent talent, Long chatId, String lang, Player player){
@@ -143,15 +156,6 @@ public class PlayerHandler {
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         var talent = talentRepository.findTalentByPlayerAndName(player, talent_name);
-
-        if(talent.getLevel() >= 20){
-            sendMessage.setText(messager.getTalent_is_maxed());
-            return sendMessage;
-        }
-            var crystal_count = 25;
-            for(int i = 0; i< talent.getLevel(); i++){
-                crystal_count = crystal_count +25;
-            }
                 talent.setLevel(talent.getLevel() + 1);
                 talentRepository.save(talent);
                 if(lang.equals("rus")){
@@ -175,6 +179,15 @@ public class PlayerHandler {
                     playerRepository.save(player);
                     /*Место для раскачки ветки*/
                 }
+        return sendMessage;
+    }
+    public SendMessage branch_up(Long chatId, String lang, app.main.GameBot.models.Way way){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        way.setLevel(way.getLevel() +1);
+        wayRepository.save(way);
+        sendMessage.setText(messager.getBranch_is_up() + way.getLevel());
         return sendMessage;
     }
 
@@ -215,6 +228,48 @@ public class PlayerHandler {
         }
         return sendMessage;
     }
+    public SendMessage branch_up_info(Long chatId, String lang, Player player, String branch_name){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        var branch = wayRepository.findWayByPlayerAndName(player, branch_name);
+
+        if(branch.getLevel() >= 20){
+            sendMessage.setText(messager.getBranch_is_maxed());
+            return sendMessage;
+        }
+        if(branch.getLevel() == player.getLevel()){
+            sendMessage.setText(messager.getLevel_is_maxed_for_branch());
+            return sendMessage;
+        }
+        var crystal_count = 25;
+        for(int i = 0; i< branch.getLevel(); i++){
+            crystal_count = (int) Math.ceil(crystal_count * 1.5);
+        }
+        var time = crystal_count * 5;
+
+        if(player.getCrystals() >= crystal_count) {
+            player.setCrystals(player.getCrystals() - crystal_count);
+
+            UpgradeProgress upgradeProgress = new UpgradeProgress();
+            upgradeProgress.setWay(branch);
+
+            Date date = new Date();
+            var newDate = date.getTime() + TimeUnit.SECONDS.toMillis(time);
+            var up_time = new Date(newDate);
+            upgradeProgress.setTime(up_time);
+            upgradeProgress.setPrice(crystal_count);
+            upgradeProgress.setPlayer(player);
+            upgradeProgressRepository.save(upgradeProgress);
+            sendMessage.setText(messager.getUp_time_branch() + time + " " + messager.getSecond() + " , " + messager.getAwait_up());
+            playerRepository.save(player);
+            sendMessage.setReplyMarkup(playerKeyboard.back_keyboard(lang));
+        }else {
+            sendMessage.setText(messager.getLittle_crystals());
+        }
+        return sendMessage;
+    }
+
 
     @Transactional
     public SendMessage back_up(Long chatId, String lang, Player player){

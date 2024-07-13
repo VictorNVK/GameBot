@@ -152,6 +152,14 @@ public class PlayerService {
             userRepository.save(user);
             return messages;
         }
+        if(callback.startsWith("branch_up_")){
+            callback = callback.substring(10);
+            messages.add(playerHandler.your_balance(chatId, user.getLanguage(), player.getCrystals()));
+            messages.add(playerHandler.branch_up_info(chatId, user.getLanguage(), player, callback));
+            messages.add(playerHandler.your_balance(chatId, user.getLanguage(), player.getCrystals()));
+            user.setUserState(UserState.GRADE);
+            userRepository.save(user);
+        }
         if(searchTalent(callback) != null){
             messages.add(playerHandler.your_talent_stats(searchTalent(callback), chatId, user.getLanguage(), player));
             messages.add(playerHandler.your_balance(chatId, user.getLanguage(), player.getCrystals()));

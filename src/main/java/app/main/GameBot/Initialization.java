@@ -42,7 +42,7 @@ public class Initialization {
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
             botsApi.registerBot(new GameBot(botConfig, locationHandler,
-                    playerRepository, userRepository, logger, menuService
+                    playerRepository, userRepository, menuService
             ,playerService, playerHandler, talentsInit));
         } catch (TelegramApiException e) {
             e.printStackTrace();

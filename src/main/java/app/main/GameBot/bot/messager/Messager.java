@@ -65,6 +65,11 @@ public abstract class Messager {
     private String await_up;
     private String second;
     private String up_is_delete;
+    private String up_branch;
+    private String branch_is_maxed;
+    private String level_is_maxed_for_branch;
+    private String up_time_branch;
+    private String branch_is_up;
 
 
 }

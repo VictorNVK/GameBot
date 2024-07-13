@@ -77,22 +77,39 @@ public class PlayerKeyboard extends Keyboard {
         keyboardMarkup.setKeyboard(rows);
         return keyboardMarkup;
     }
-    public InlineKeyboardMarkup talents_list(List<Talent> talents, String lang){
+    public InlineKeyboardMarkup talents_list(List<Talent> talents, String lang, app.main.GameBot.models.Way way){
         choose_lang(lang);
         var keyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         for(int i = 0; i < talents.size(); i ++){
-            List<InlineKeyboardButton> row1 = new ArrayList<>();
-            var button1 = new InlineKeyboardButton();
-            if(lang.equals("rus")) {
-                button1.setText(talents.get(i).getNameRu());
-            }else if(lang.equals("eng")) {
-                button1.setText(talents.get(i).getNameEn());
+            if(talents.get(i).getUnlocked_way_level() <= way.getLevel()) {
+                List<InlineKeyboardButton> row1 = new ArrayList<>();
+                var button1 = new InlineKeyboardButton();
+                if (lang.equals("rus")) {
+                    button1.setText(talents.get(i).getNameRu());
+                } else if (lang.equals("eng")) {
+                    button1.setText(talents.get(i).getNameEn());
+                }
+                button1.setCallbackData(talents.get(i).getNameEn());
+                row1.add(button1);
+                rows.add(row1);
             }
-            button1.setCallbackData(talents.get(i).getNameEn());
-            row1.add(button1);
-            rows.add(row1);
         }
+        List<InlineKeyboardButton> row3 = new ArrayList<>();
+        var up_branch = new InlineKeyboardButton();
+        up_branch.setText(messager.getUp_branch());
+        up_branch.setCallbackData("branch_up_" + way.getName());
+        row3.add(up_branch);
+        rows.add(row3);
+
+
+        List<InlineKeyboardButton> row2 = new ArrayList<>();
+        var back = new InlineKeyboardButton();
+        back.setText(messager.getBack());
+        back.setCallbackData("back");
+        row2.add(back);
+        rows.add(row2);
+
         keyboardMarkup.setKeyboard(rows);
         return keyboardMarkup;
     }

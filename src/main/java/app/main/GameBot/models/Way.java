@@ -2,9 +2,6 @@ package app.main.GameBot.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.glassfish.grizzly.http.util.TimeStamp;
-
-import java.util.Date;
 
 @Entity
 @Getter
@@ -12,27 +9,21 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UpgradeProgress {
+public class Way {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column
-    private Date time;
-
-    @ManyToOne
-    @JoinColumn(name = "talent_id")
-    private Talent talent;
-
-    @ManyToOne
-    @JoinColumn(name = "way_id")
-    private Way way;
+    private String name;
 
     @ManyToOne
     @JoinColumn(name = "player_id")
     private Player player;
 
     @Column
-    private Integer price;
+    private Integer level = 0;
+
+
 }

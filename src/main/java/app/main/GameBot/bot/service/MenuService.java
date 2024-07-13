@@ -29,15 +29,9 @@ public class MenuService {
     private final PlayerHandler playerHandler;
     private final LocationHandler locationHandler;
     private final UserRepository userRepository;
-    private User _user;
-    private Player _player;
-
-
 
     public List<BotApiMethodMessage> message_menu_handle(Update update, User user){
-        this._user = user;
-
-        List<BotApiMethodMessage> messages= new ArrayList<>();
+        List<BotApiMethodMessage> messages = new ArrayList<>();
         var chatId = update.getMessage().getChat().getId();
         var command = update.getMessage().getText();
         if (command.startsWith("/start")){
@@ -59,7 +53,6 @@ public class MenuService {
     }
     public List<BotApiMethodMessage> callback_menu_handle(Update update, User user){
 
-        this._user = user;
         Player player = playerRepository.findPlayerById(user.getId());
         List<BotApiMethodMessage> messages = new ArrayList<>();
         var callback = update.getCallbackQuery().getData();
@@ -69,6 +62,7 @@ public class MenuService {
             callback = callback.substring(5);
             user.setLanguage(callback);
             user.setUserState(UserState.GET_NAME);
+            userRepository.save(user);
             messages.add(menuHandler.get_name(chatId, user.getLanguage()));
             return messages;
         }
@@ -79,16 +73,17 @@ public class MenuService {
             playerRepository.save(newPlayer);
             logger.log(nickname, newPlayer.getId(), "зарегистрировался", null);
             user.setUserState(UserState.MENU);
+            userRepository.save(user);
             messages.add(menuHandler.greeting(chatId, user.getLanguage(), newPlayer.getNickname()));
             messages.add(locationHandler.clearing_start_location(chatId, user.getLanguage()));
             messages.add(menuHandler.menu(chatId, user.getLanguage()));
             return messages;
 
         }
-        if(callback.startsWith("back")){
-            user.setUserState(UserState.MENU);
+        if(callback.startsWith("back") && user.getUserState().equals(UserState.GRADE)){
             messages.add(playerHandler.back_up(chatId, user.getLanguage() , player));
             messages.add(playerHandler.your_balance(chatId, user.getLanguage(), player.getCrystals()));
+            user.setUserState(UserState.MENU);
             userRepository.save(user);
         }
         return messages;
