@@ -85,14 +85,13 @@ public class GameBot extends TelegramLongPollingBot {
         if (user.getUserState() == null) {
             List<BotApiMethodMessage> messages = menuService.message_menu_handle(update, user);
             sendMessages(messages);
-
             return;
         }
         if (user.getUserState().equals(UserState.GET_NAME)) {
-            user.setUserState(UserState.MENU);
-            userRepository.save(user);
             List<BotApiMethodMessage> messages = menuService.message_menu_handle(update, user);
             sendMessages(messages);
+            user.setUserState(UserState.MENU);
+            userRepository.save(user);
         }
     }
 

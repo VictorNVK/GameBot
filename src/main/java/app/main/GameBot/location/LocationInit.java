@@ -1,5 +1,7 @@
 package app.main.GameBot.location;
 
+import app.main.GameBot.enemy.Enemy;
+import app.main.GameBot.enemy.Wolf;
 import app.main.GameBot.models.Item;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
@@ -40,6 +42,9 @@ public class LocationInit {
         clearing.getItems().add(leaves);
         locations.add(clearing);
         this.clearing = clearing;
+        ArrayList<Enemy> enemy = new ArrayList<>();
+        enemy.add(new Wolf());
+        clearing.setEnemy(enemy);
 
         /*Пригород*/
         Suburb suburb = new Suburb();

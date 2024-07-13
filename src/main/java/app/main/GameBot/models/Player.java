@@ -35,10 +35,19 @@ public class Player {
     private Integer health = 20;
 
     @Column
+    private Integer healthNow = 20;
+
+    @Column
     private Integer energy = 10;
 
     @Column
+    private Integer energyNow = 10;
+
+    @Column
     private Integer blood = 5;
+
+    @Column
+    private Integer bloodNow = 5;
 
     @Column
     private Integer attack = 1;

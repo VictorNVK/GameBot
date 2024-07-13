@@ -9,6 +9,7 @@ import app.main.GameBot.models.UpgradeProgress;
 import app.main.GameBot.models.User;
 import app.main.GameBot.repositories.*;
 import app.main.GameBot.states.Location;
+import app.main.GameBot.states.UserState;
 import app.main.GameBot.talent.Talent;
 import app.main.GameBot.way.Way;
 import jakarta.transaction.Transactional;
@@ -66,9 +67,9 @@ public class PlayerHandler {
         sendMessage.setText(messager.getCharacteristics() +
                 "\n\n"
                 + messager.getLevel() + player.getLevel() + "\uD83C\uDF1F"
-                +"\n"+ messager.getHealth() + player.getHealth() + "♥\uFE0F"
-        +"\n" +messager.getEnergy() + player.getEnergy() + "⚡\uFE0F"
-        +"\n" + messager.getBlood() + player.getBlood() + "\uD83E\uDE78"
+                +"\n"+ messager.getHealth() + player.getHealthNow() + "/" + player.getHealth() + "♥\uFE0F"
+        +"\n" +messager.getEnergy() + player.getEnergyNow() + "/" + player.getEnergy() + "⚡\uFE0F"
+        +"\n" + messager.getBlood() + player.getBloodNow() + "/" + player.getBlood() + "\uD83E\uDE78"
                 +"\n" + messager.getAttack() + player.getAttack() + "\uD83D\uDDE1"
         +"\n" +messager.getDefense() + player.getDefense() + "\uD83D\uDEE1"
                         +"\n" +messager.getBarrier() + player.getBarrier() + "\uD83D\uDD35"
@@ -191,7 +192,7 @@ public class PlayerHandler {
         return sendMessage;
     }
 
-    public SendMessage talent_up_info(Long chatId, String lang, Player player, String talent_name){
+    public SendMessage talent_up_info(Long chatId, String lang, Player player, String talent_name, User user){
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -201,9 +202,9 @@ public class PlayerHandler {
             sendMessage.setText(messager.getTalent_is_maxed());
             return sendMessage;
         }
-        var crystal_count = 25;
+        var crystal_count = 15;
         for(int i = 0; i< talent.getLevel(); i++){
-            crystal_count = crystal_count +25;
+            crystal_count = crystal_count +15;
         }
         var time = crystal_count * 5;
 
@@ -223,12 +224,15 @@ public class PlayerHandler {
             sendMessage.setText(messager.getUp_time() + time + " " + messager.getSecond() + " , " + messager.getAwait_up());
             playerRepository.save(player);
             sendMessage.setReplyMarkup(playerKeyboard.back_keyboard(lang));
+            user.setUserState(UserState.GRADE);
+            userRepository.save(user);
         }else {
+
             sendMessage.setText(messager.getLittle_crystals());
         }
         return sendMessage;
     }
-    public SendMessage branch_up_info(Long chatId, String lang, Player player, String branch_name){
+    public SendMessage branch_up_info(Long chatId, String lang, Player player, String branch_name, User user){
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -264,6 +268,8 @@ public class PlayerHandler {
             sendMessage.setText(messager.getUp_time_branch() + time + " " + messager.getSecond() + " , " + messager.getAwait_up());
             playerRepository.save(player);
             sendMessage.setReplyMarkup(playerKeyboard.back_keyboard(lang));
+            user.setUserState(UserState.GRADE);
+            userRepository.save(user);
         }else {
             sendMessage.setText(messager.getLittle_crystals());
         }

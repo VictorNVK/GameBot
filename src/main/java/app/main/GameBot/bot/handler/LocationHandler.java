@@ -4,9 +4,7 @@ import app.main.GameBot.bot.keyboard.LocationKeyboard;
 import app.main.GameBot.bot.messager.Messager;
 import app.main.GameBot.bot.messager.MessagerEn;
 import app.main.GameBot.bot.messager.MessagerRu;
-import app.main.GameBot.location.Clearing;
 import app.main.GameBot.location.LocationInit;
-import app.main.GameBot.location.Suburb;
 import app.main.GameBot.models.Item;
 import app.main.GameBot.models.Player;
 import app.main.GameBot.other.Logger;
@@ -64,15 +62,25 @@ public class LocationHandler {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
+        Random random = new Random();
+        int number = random.nextInt(2);
         if(player.getLocation().equals(Location.CLEARING)){
-            Item item = searchRandomItem(locationInit.getClearing().getItems(),
-                    player, locationInit.getClearing().getRooms());
-            sendMessage = item(sendMessage, player, lang, item);
+            if (number == 0) {
+                Item item = searchRandomItem(locationInit.getClearing().getItems(),
+                        player, locationInit.getClearing().getRooms());
+                sendMessage = item(sendMessage, player, lang, item);
+            }else {
+
+            }
         }
         else if(player.getLocation().equals(Location.SUBURB)){
-            Item item = searchRandomItem(locationInit.getSuburb().getItems(),
-                    player, locationInit.getSuburb().getRooms());
-            sendMessage = item(sendMessage, player, lang, item);
+            if (number == 0) {
+                Item item = searchRandomItem(locationInit.getSuburb().getItems(),
+                        player, locationInit.getSuburb().getRooms());
+                sendMessage = item(sendMessage, player, lang, item);
+            }else {
+
+            }
         }
 
         return sendMessage;
