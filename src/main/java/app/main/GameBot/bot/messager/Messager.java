@@ -70,6 +70,9 @@ public abstract class Messager {
     private String level_is_maxed_for_branch;
     private String up_time_branch;
     private String branch_is_up;
+    private String you_under_attack;
+    private String you_have_20_second;
+    private String attacking;
 
 
 }

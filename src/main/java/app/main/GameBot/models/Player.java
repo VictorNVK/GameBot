@@ -1,6 +1,5 @@
 package app.main.GameBot.models;
 
-import app.main.GameBot.states.Location;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,8 +21,8 @@ public class Player {
     @Column
     private String nickname;
 
-    @Enumerated
-    private Location location;
+    @Column
+    private String location;
 
     @Column
     private Integer level = 1;

@@ -9,8 +9,6 @@ import app.main.GameBot.models.User;
 import app.main.GameBot.other.Logger;
 import app.main.GameBot.repositories.ItemRepository;
 import app.main.GameBot.repositories.UserRepository;
-import app.main.GameBot.states.Location;
-import app.main.GameBot.states.UserState;
 import app.main.GameBot.talent.Talent;
 import app.main.GameBot.talent.TalentsInit;
 import app.main.GameBot.way.Way;
@@ -116,7 +114,7 @@ public class PlayerService {
             return messages;
         }
         if (callback.startsWith("Clearing")) {
-            player.setLocation(Location.CLEARING);
+            player.setLocation(callback);
             messages.add(locationHandler.location_has_been_chosen(chatId, user.getLanguage()));
             messages.add(locationHandler.action_menu(chatId, user.getLanguage()));
 
@@ -124,7 +122,7 @@ public class PlayerService {
                     "Поляна");
         }
         if (callback.startsWith("Suburb")) {
-            player.setLocation(Location.SUBURB);
+            player.setLocation(callback);
             messages.add(locationHandler.location_has_been_chosen(chatId, user.getLanguage()));
             messages.add(locationHandler.action_menu(chatId, user.getLanguage()));
             logger.log(player.getNickname(), user.getId(), "выбрал пункт меню смена локации",

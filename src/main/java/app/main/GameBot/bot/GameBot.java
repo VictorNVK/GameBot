@@ -2,6 +2,7 @@ package app.main.GameBot.bot;
 import app.main.GameBot.bot.config.BotConfig;
 import app.main.GameBot.bot.handler.LocationHandler;
 import app.main.GameBot.bot.handler.PlayerHandler;
+import app.main.GameBot.bot.service.FightService;
 import app.main.GameBot.bot.service.MenuService;
 import app.main.GameBot.bot.service.PlayerService;
 import app.main.GameBot.models.Player;
@@ -22,8 +23,10 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 /*Главный метод бота. Здесь обрабатываются все обновления от клиента, после чего вызываются нужные хендлеры
  * для дальнейшей обработки и обновления*/
@@ -39,12 +42,13 @@ public class GameBot extends TelegramLongPollingBot {
     private final PlayerService playerService;
     private final PlayerHandler playerHandler;
     private final TalentsInit talentsInit;
+    private final FightService fightService;
 
 
     public GameBot(BotConfig botConfig,
                    LocationHandler locationHandler,
                    PlayerRepository playerRepository, UserRepository userRepository, MenuService menuService,
-                   PlayerService playerService, PlayerHandler playerHandler, TalentsInit talentsInit) {
+                   PlayerService playerService, PlayerHandler playerHandler, TalentsInit talentsInit, FightService fightService) {
         this.botConfig = botConfig;
         this.locationHandler = locationHandler;
         this.playerRepository = playerRepository;
@@ -53,6 +57,7 @@ public class GameBot extends TelegramLongPollingBot {
         this.playerService = playerService;
         this.playerHandler = playerHandler;
         this.talentsInit = talentsInit;
+        this.fightService = fightService;
     }
 
     @Override
@@ -126,10 +131,30 @@ public class GameBot extends TelegramLongPollingBot {
                         e.printStackTrace();
                     }
                     try {
-                        execute(locationHandler.search(chatId, user.getLanguage(), player));
-                        execute(locationHandler.action_menu(chatId, user.getLanguage()));
-                        user.setUserState(UserState.MENU);
-                        updateUser(user);
+                        execute(locationHandler.search(chatId, user.getLanguage(), player, user));
+                        User user1 = userRepository.findUserByChatId(user.getChatId());
+
+                        if(user1.getUserState().equals(UserState.MENU)) {
+                            execute(locationHandler.action_menu(chatId, user.getLanguage()));
+                        }
+                        if(user1.getUserState().equals(UserState.FIGHT)){
+                            execute(fightService.under_attack(chatId, user.getLanguage(), user, player));
+                            Random random = new Random();
+                            var number = random.nextInt(2);
+                            if(true){
+                                 execute(fightService.enemy_attack(chatId, user.getLanguage(), player));
+                            }
+                            CompletableFuture.runAsync(() -> {
+                                try {
+                                    TimeUnit.SECONDS.sleep(20);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
+                            });
+
+                        }
+
                     } catch (TelegramApiException e) {
                         throw new RuntimeException(e);
                     }
@@ -146,6 +171,9 @@ public class GameBot extends TelegramLongPollingBot {
             List<BotApiMethodMessage> messages = menuService.callback_menu_handle(update, user);
             sendMessages(messages);
             return;
+        }
+        if(user.getUserState().equals(UserState.FIGHT)){
+
         }
     }
 

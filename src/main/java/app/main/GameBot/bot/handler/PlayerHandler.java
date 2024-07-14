@@ -8,7 +8,6 @@ import app.main.GameBot.models.Player;
 import app.main.GameBot.models.UpgradeProgress;
 import app.main.GameBot.models.User;
 import app.main.GameBot.repositories.*;
-import app.main.GameBot.states.Location;
 import app.main.GameBot.states.UserState;
 import app.main.GameBot.talent.Talent;
 import app.main.GameBot.way.Way;
@@ -47,7 +46,7 @@ public class PlayerHandler {
         var player = new Player();
         player.setId(user.getId());
         player.setNickname(name);
-        player.setLocation(Location.CLEARING);
+        player.setLocation("Clearing");
         player.setCrystals(50);
         return player;
     }

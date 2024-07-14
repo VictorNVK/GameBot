@@ -4,13 +4,16 @@ import app.main.GameBot.bot.keyboard.LocationKeyboard;
 import app.main.GameBot.bot.messager.Messager;
 import app.main.GameBot.bot.messager.MessagerEn;
 import app.main.GameBot.bot.messager.MessagerRu;
+import app.main.GameBot.bot.service.FightService;
 import app.main.GameBot.location.LocationInit;
 import app.main.GameBot.models.Item;
 import app.main.GameBot.models.Player;
+import app.main.GameBot.models.User;
 import app.main.GameBot.other.Logger;
 import app.main.GameBot.repositories.ItemRepository;
 import app.main.GameBot.repositories.PlayerRepository;
-import app.main.GameBot.states.Location;
+import app.main.GameBot.repositories.UserRepository;
+import app.main.GameBot.states.UserState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -31,6 +34,8 @@ public class LocationHandler {
     private final PlayerRepository playerRepository;
     private final Logger logger;
     private final LocationInit locationInit;
+    private final UserRepository userRepository;
+    private final FightService fightService;
 
 
     private void choose_lang(String lang) {
@@ -58,28 +63,36 @@ public class LocationHandler {
         return sendMessage;
     }
 
-    public SendMessage search(Long chatId, String lang, Player player){
+    public SendMessage search(Long chatId, String lang, Player player, User user){
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         Random random = new Random();
         int number = random.nextInt(2);
-        if(player.getLocation().equals(Location.CLEARING)){
+        if(player.getLocation().equals("Clearing")){
             if (number == 0) {
                 Item item = searchRandomItem(locationInit.getClearing().getItems(),
                         player, locationInit.getClearing().getRooms());
                 sendMessage = item(sendMessage, player, lang, item);
+                user.setUserState(UserState.MENU);
+                userRepository.save(user);
             }else {
-
+                user.setUserState(UserState.FIGHT);
+                userRepository.save(user);
+                sendMessage.setText(messager.getAttacking());
             }
         }
-        else if(player.getLocation().equals(Location.SUBURB)){
+        else if(player.getLocation().equals("Suburb")){
             if (number == 0) {
                 Item item = searchRandomItem(locationInit.getSuburb().getItems(),
                         player, locationInit.getSuburb().getRooms());
                 sendMessage = item(sendMessage, player, lang, item);
+                user.setUserState(UserState.MENU);
+                userRepository.save(user);
             }else {
-
+                user.setUserState(UserState.FIGHT);
+                userRepository.save(user);
+                sendMessage.setText(messager.getAttacking());
             }
         }
 

@@ -69,5 +69,8 @@ public class MessagerRu extends Messager {
     private final String level_is_maxed_for_branch = "Достигнут максимальный уровень ветки для вашего уровня!";
     private final String up_time_branch = "Прокачка ветки займёт: ";
     private final String branch_is_up = "Ветка была улучшена, текущий уровень ветки - " ;
+    private final String you_under_attack = "Вы были атакованы ";
+    private final String you_have_20_second = "У вас 20 секунд что бы выбрать действие\uD83D\uDD50";
+    private final String attacking = "Вас атакуют⚔\uFE0F";
 }
 
