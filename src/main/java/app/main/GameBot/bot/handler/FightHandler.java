@@ -163,10 +163,26 @@ public class FightHandler {
         sendMessage.setReplyMarkup(fightKeyboard.actions_keyboard(lang));
         return sendMessage;
     }
-    private SendMessage check_death(Long chatId, String lang, Player player, Enemy enemy){
+    public SendMessage evade(Long chatId, String lang){
+        choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
+        Random random = new Random();
+        int randomNumber = random.nextInt(100) + 1;
+        if (randomNumber <= 70) {
+            sendMessage.setText(messager.getEvade_is_successful());
+            /*Логика с отменой боя и установкой статуса Menu для пользователя*/
+        } else {
+            sendMessage.setText(messager.getEvade_is_unsuccessful());
+            /*Тут хз пока что*/
+        }
         return sendMessage;
+    }
+    private Boolean check_death(Long chatId, String lang, Player player, Enemy enemy){
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+
+        return true;
     }
     public SendMessage enemy_step(Long chatId, String lang){
         choose_lang(lang);

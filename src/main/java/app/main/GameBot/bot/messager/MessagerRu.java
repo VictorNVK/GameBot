@@ -80,5 +80,7 @@ public class MessagerRu extends Messager {
     private final String evade = "Побег\uD83E\uDDB5";
     private final String player_step = "Ваш ход\uD83D\uDD58";
     private final String enemy_step = "Ход врага\uD83D\uDD58";
+    private final String evade_is_successful = "Побег удался✅";
+    private final String evade_is_unsuccessful = "Побег не удался, бой продолжается❌";
 }
 

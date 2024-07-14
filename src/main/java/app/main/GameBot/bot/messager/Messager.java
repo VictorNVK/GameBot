@@ -81,4 +81,6 @@ public abstract class Messager {
     private String evade;
     private String player_step;
     private String enemy_step;
+    private String evade_is_successful;
+    private String evade_is_unsuccessful;
 }
