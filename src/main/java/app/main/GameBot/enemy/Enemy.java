@@ -21,16 +21,23 @@ public abstract class Enemy {
     private String nameRu;
 
 
-    public Player attack(Player player){
+    public Player attack(Player player, app.main.GameBot.models.Enemy enemy){
         return null;
     }
 
-    public Player attack_talent(Player player, Integer counter){
+    public Player attack_talent(Player player, Integer counter, app.main.GameBot.models.Enemy enemy){
         return null;
     }
+    public Boolean talent_condition(Player player, Integer counter, app.main.GameBot.models.Enemy enemy){
+        return true;
+    }
 
-    public void scale(Player player){
+    public Enemy scale(Enemy enemy, Player player){
+        return enemy ;
+    }
 
+    public app.main.GameBot.models.Enemy talent_price(app.main.GameBot.models.Enemy enemy){
+        return enemy;
     }
 
     public app.main.GameBot.models.Enemy toModel(Enemy enemy, app.main.GameBot.models.Enemy enemy_model){

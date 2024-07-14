@@ -142,16 +142,48 @@ public class GameBot extends TelegramLongPollingBot {
                             Random random = new Random();
                             var number = random.nextInt(2);
                             if(true){
-                                 execute(fightService.enemy_attack(chatId, user.getLanguage(), player));
-                            }
+                                user.setUserState(UserState.FIGHT_AWAIT);
+                                userRepository.save(user);
+                                execute(fightService.first_enemy_step(chatId, user.getLanguage()));
+                                CompletableFuture.runAsync(() -> {
+                                    try {
+                                        TimeUnit.SECONDS.sleep(15);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    try {
+                                        execute(fightService.enemy_attack(chatId, user.getLanguage(), player));
+                                        execute(fightService.sendCharacteristics(chatId, user.getLanguage(), player));
+                                        user.setUserState(UserState.FIGHT);
+                                        userRepository.save(user);
+
+                                        /*Ход игрока*/
+                                    } catch (TelegramApiException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                });
+
+                            }else{
                             CompletableFuture.runAsync(() -> {
                                 try {
                                     TimeUnit.SECONDS.sleep(20);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
-
+                                if(user.getUserState().equals(UserState.FIGHT_AWAIT)){
+                                    try {
+                                        execute(fightService.enemy_attack(chatId, user.getLanguage(), player));
+                                    } catch (TelegramApiException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    try {
+                                        execute(fightService.sendCharacteristics(chatId, user.getLanguage(), player));
+                                    } catch (TelegramApiException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
                             });
+                            }
 
                         }
 
@@ -173,6 +205,9 @@ public class GameBot extends TelegramLongPollingBot {
             return;
         }
         if(user.getUserState().equals(UserState.FIGHT)){
+
+        }
+        if(user.getUserState().equals(UserState.FIGHT_AWAIT)){
 
         }
     }

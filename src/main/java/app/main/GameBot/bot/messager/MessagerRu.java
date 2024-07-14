@@ -72,5 +72,8 @@ public class MessagerRu extends Messager {
     private final String you_under_attack = "Вы были атакованы ";
     private final String you_have_20_second = "У вас 20 секунд что бы выбрать действие\uD83D\uDD50";
     private final String attacking = "Вас атакуют⚔\uFE0F";
+    private final String first_enemy_step = "Враг ходит первым!";
+    private final String enemy_use_attack = "Враг использовал обычную атаку!";
+    private final String enemy_use_skill = "Враг использовал навык!";
 }
 

@@ -20,28 +20,35 @@ public class Wolf extends Enemy{
     private String nameRu = "Волк";
 
 
-    public void scale(Player player){
-        health = health * player.getLevel();
-        attack = 1 + player.getLevel() * attack;
-        energy = energy * player.getLevel();
-    }
 
-    public Player attack(Player player){
-        attack = attack - player.getDefense();
-        if(attack < 0){
-            attack = 0;
+    public Player attack(Player player, app.main.GameBot.models.Enemy enemy){
+        var damage = enemy.getAttack() - player.getDefense();
+        if(damage< 0){
+            damage = 0;
         }
-        player.setHealthNow(player.getHealth() - attack);
+        player.setHealthNow(player.getHealth() - damage);
         return player;
     }
+
+    public Boolean talent_condition(Player player, Integer counter, app.main.GameBot.models.Enemy enemy){
+        if(counter >=2 && counter % 2 == 0 && enemy.getEnergy() >= 5) {
+            return true;
+        }
+        return false;
+    }
+
+
 
     public Player attack_talent(Player player, Integer counter, app.main.GameBot.models.Enemy enemy){
-        if(counter >=2 && counter % 2 == 0) {
-            player.setHealthNow(player.getHealth() - attack *2);
-        }else {
-            return attack(player);
-        }
+            player.setHealthNow(player.getHealth() - attack * 2);
         return player;
+    }
+
+    public Enemy scale(Enemy enemy, Player player){
+        enemy.setHealth(enemy.getHealth() * player.getLevel());
+        enemy.setHealth(enemy.getEnergy() * player.getLevel());
+        enemy.setHealth(1 + player.getLevel() * enemy.getAttack());
+        return enemy;
     }
     public app.main.GameBot.models.Enemy talent_price(app.main.GameBot.models.Enemy enemy){
         enemy.setEnergy(enemy.getEnergy() -5);

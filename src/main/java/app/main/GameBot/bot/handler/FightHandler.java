@@ -39,7 +39,7 @@ public class FightHandler {
         }
     }
 
-    public SendMessage under_attack(Long chatId, String lang, User user, Player player){
+    public SendMessage under_attack(Long chatId, String lang, User user, Player player) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -47,23 +47,23 @@ public class FightHandler {
         Random random = new Random();
         var number = random.nextInt(location.getEnemy().size());
 
-        if(lang.equals("rus")){
+        if (lang.equals("rus")) {
             var text = messager.getYou_under_attack() + location.getEnemy().get(number).getNameRu();
-            text += "\n\n" + messager.getYou_have_20_second();
             sendMessage.setText(text);
-        }else{
+        } else {
             var text = messager.getYou_under_attack() + location.getEnemy().get(number).getNameEn();
-            text += "\n\n" + messager.getYou_have_20_second();
             sendMessage.setText(text);
         }
-        app.main.GameBot.enemy.Enemy enemy =location.getEnemy().get(number);
+        app.main.GameBot.enemy.Enemy enemy = location.getEnemy().get(number);
 
         Enemy enemy_model = new Enemy();
+        enemy = enemy.scale(enemy, player);
         enemy_model.setAttack(enemy.getAttack());
         enemy_model.setNameEn(enemy.getNameEn());
         enemy_model.setEnergy(enemy.getEnergy());
         enemy_model.setHealth(enemy.getHealth());
         enemy_model.setDefense(enemy.getDefense());
+
         enemyRepository.save(enemy_model);
 
         Fight fight = new Fight();
@@ -75,30 +75,37 @@ public class FightHandler {
         return sendMessage;
     }
 
-    private Location search_location(String name){
-        for(Location location : locationInit.getLocations()){
-            if(location.getNameEn().equals(name)){
+    private Location search_location(String name) {
+        for (Location location : locationInit.getLocations()) {
+            if (location.getNameEn().equals(name)) {
                 return location;
             }
         }
         return null;
     }
-    public SendMessage enemy_attack(Long chatId, String lang, Player player){
+
+    public SendMessage enemy_attack(Long chatId, String lang, Player player) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        sendMessage.setText("Удар");
+
         Fight fight = fightRepository.findByPlayer(player);
         app.main.GameBot.enemy.Enemy enemy = search_enemy(fight.getEnemy().getNameEn(), player.getLocation());
-        enemy.scale(player);
+        Enemy enemy_model = fight.getEnemy();
         Random random = new Random();
         var number = random.nextInt(2);
-        if(number == 5){
-            player = enemy.attack(player);
+        if (number == 1) {
+            player = enemy.attack(player, enemy_model);
+            sendMessage.setText(messager.getEnemy_use_attack());
+        } else if(enemy.talent_condition(player, fight.getCounter(), enemy_model)) {
+            player = enemy.attack_talent(player, fight.getCounter(), enemy_model);
+            enemy_model = enemy.talent_price(enemy_model);
+            sendMessage.setText(messager.getEnemy_use_skill());
         }else {
-            player = enemy.attack_talent(player, fight.getCounter());
+            player = enemy.attack(player, enemy_model);
+            sendMessage.setText(messager.getEnemy_use_attack());
         }
-        enemyRepository.save(enemy.toModel(enemy, fight.getEnemy()));
+        enemyRepository.save(enemy_model);
 
         playerRepository.save(player);
         fight.setCounter(fight.getCounter() + 1);
@@ -106,13 +113,38 @@ public class FightHandler {
         return sendMessage;
     }
 
-    private app.main.GameBot.enemy.Enemy search_enemy(String name, String location_name){
-            Location location = search_location(location_name);
-            for(app.main.GameBot.enemy.Enemy enemy : location.getEnemy()){
-                if(enemy.getNameEn().equals(name)){
-                    return enemy;
-                }
+    public SendMessage first_enemy_step(Long chatId, String lang) {
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getFirst_enemy_step());
+        return sendMessage;
+    }
+
+    private app.main.GameBot.enemy.Enemy search_enemy(String name, String location_name) {
+        Location location = search_location(location_name);
+        for (app.main.GameBot.enemy.Enemy enemy : location.getEnemy()) {
+            if (enemy.getNameEn().equals(name)) {
+                return enemy;
             }
+        }
         return null;
+    }
+
+    public SendMessage sendCharacteristics(Long chatId, String lang, Player player) {
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getCharacteristics() +
+                "\n\n"
+                + messager.getLevel() + player.getLevel() + "\uD83C\uDF1F"
+                + "\n" + messager.getHealth() + player.getHealthNow() + "/" + player.getHealth() + "♥\uFE0F"
+                + "\n" + messager.getEnergy() + player.getEnergyNow() + "/" + player.getEnergy() + "⚡\uFE0F"
+                + "\n" + messager.getBlood() + player.getBloodNow() + "/" + player.getBlood() + "\uD83E\uDE78"
+                + "\n" + messager.getAttack() + player.getAttack() + "\uD83D\uDDE1"
+                + "\n" + messager.getDefense() + player.getDefense() + "\uD83D\uDEE1"
+                + "\n" + messager.getBarrier() + player.getBarrier() + "\uD83D\uDD35");
+
+        return sendMessage;
     }
 }

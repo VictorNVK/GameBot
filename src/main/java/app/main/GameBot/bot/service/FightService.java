@@ -42,6 +42,15 @@ public class FightService {
         return fightHandler.under_attack(chatId, lang, user, player);
     }
     public SendMessage enemy_attack(Long chatId, String lang, Player player){
+
+
+
         return fightHandler.enemy_attack(chatId, lang, player);
+    }
+    public SendMessage first_enemy_step(Long chatId, String lang){
+        return fightHandler.first_enemy_step(chatId, lang);
+    }
+    public SendMessage sendCharacteristics(Long chatId, String lang, Player player){
+        return fightHandler.sendCharacteristics(chatId, lang, player);
     }
 }

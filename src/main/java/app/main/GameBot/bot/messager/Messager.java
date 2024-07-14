@@ -73,6 +73,7 @@ public abstract class Messager {
     private String you_under_attack;
     private String you_have_20_second;
     private String attacking;
-
-
+    private String first_enemy_step;
+    private String enemy_use_attack;
+    private String enemy_use_skill;
 }
