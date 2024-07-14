@@ -75,5 +75,10 @@ public class MessagerRu extends Messager {
     private final String first_enemy_step = "Враг ходит первым!";
     private final String enemy_use_attack = "Враг использовал обычную атаку!";
     private final String enemy_use_skill = "Враг использовал навык!";
+    private final String skills = "Навыки⚔\uFE0F";
+    private final String actions = "Действия\uD83D\uDCA1";
+    private final String evade = "Побег\uD83E\uDDB5";
+    private final String player_step = "Ваш ход\uD83D\uDD58";
+    private final String enemy_step = "Ход врага\uD83D\uDD58";
 }
 

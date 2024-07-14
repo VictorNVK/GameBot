@@ -26,4 +26,7 @@ public class Talent {
 
     @Column
     private Integer level = 0;
+
+    @Column
+    private Boolean active = false;
 }

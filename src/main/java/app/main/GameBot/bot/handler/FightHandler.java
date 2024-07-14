@@ -84,7 +84,7 @@ public class FightHandler {
         return null;
     }
 
-    public SendMessage enemy_attack(Long chatId, String lang, Player player) {
+        public SendMessage enemy_attack(Long chatId, String lang, Player player) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -145,6 +145,41 @@ public class FightHandler {
                 + "\n" + messager.getDefense() + player.getDefense() + "\uD83D\uDEE1"
                 + "\n" + messager.getBarrier() + player.getBarrier() + "\uD83D\uDD35");
 
+        return sendMessage;
+    }
+    public SendMessage fight_menu(Long chatId, String lang){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getChoose_param_of_menu());
+        sendMessage.setReplyMarkup(fightKeyboard.action_menu(lang));
+        return sendMessage;
+    }
+    public SendMessage actions(Long chatId, String lang){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getChoose_param_of_menu());
+        sendMessage.setReplyMarkup(fightKeyboard.actions_keyboard(lang));
+        return sendMessage;
+    }
+    private SendMessage check_death(Long chatId, String lang, Player player, Enemy enemy){
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        return sendMessage;
+    }
+    public SendMessage enemy_step(Long chatId, String lang){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getEnemy_step());
+        return sendMessage;
+    }
+    public SendMessage player_step(Long chatId, String lang){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getPlayer_step());
         return sendMessage;
     }
 }

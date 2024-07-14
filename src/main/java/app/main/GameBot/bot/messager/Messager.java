@@ -76,4 +76,9 @@ public abstract class Messager {
     private String first_enemy_step;
     private String enemy_use_attack;
     private String enemy_use_skill;
+    private String skills;
+    private String actions;
+    private String evade;
+    private String player_step;
+    private String enemy_step;
 }

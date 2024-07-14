@@ -35,6 +35,21 @@ public class FightService {
         List<BotApiMethodMessage> messages = new ArrayList<>();
         var callback = update.getCallbackQuery().getData();
         var chatId = update.getCallbackQuery().getFrom().getId();
+
+        if(callback.startsWith("skills")){
+
+        }
+        if(callback.startsWith("actions")){
+            messages.add(fightHandler.actions(chatId, user.getLanguage()));
+        }
+        if(callback.startsWith("evade")){
+
+        }
+        if(callback.startsWith("back")){
+            messages.add(fightHandler.fight_menu(chatId, user.getLanguage()));
+        }
+
+
         return messages;
     }
 
@@ -42,7 +57,6 @@ public class FightService {
         return fightHandler.under_attack(chatId, lang, user, player);
     }
     public SendMessage enemy_attack(Long chatId, String lang, Player player){
-
 
 
         return fightHandler.enemy_attack(chatId, lang, player);
@@ -53,4 +67,15 @@ public class FightService {
     public SendMessage sendCharacteristics(Long chatId, String lang, Player player){
         return fightHandler.sendCharacteristics(chatId, lang, player);
     }
+    public SendMessage fight_menu(Long chatId, String lang){
+        return fightHandler.fight_menu(chatId, lang);
+    }
+    public SendMessage enemy_step(Long chatId, String lang){
+        return fightHandler.enemy_step(chatId, lang);
+    }
+    public SendMessage player_step(Long chatId, String lang){
+        return fightHandler.player_step(chatId, lang);
+    }
+
+
 }

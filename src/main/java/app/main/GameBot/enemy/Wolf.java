@@ -26,7 +26,7 @@ public class Wolf extends Enemy{
         if(damage< 0){
             damage = 0;
         }
-        player.setHealthNow(player.getHealth() - damage);
+        player.setHealthNow(player.getHealthNow() - damage);
         return player;
     }
 
@@ -40,7 +40,7 @@ public class Wolf extends Enemy{
 
 
     public Player attack_talent(Player player, Integer counter, app.main.GameBot.models.Enemy enemy){
-            player.setHealthNow(player.getHealth() - attack * 2);
+            player.setHealthNow(player.getHealthNow() - attack * 2);
         return player;
     }
 
