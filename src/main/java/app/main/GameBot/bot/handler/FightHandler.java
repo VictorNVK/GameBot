@@ -8,19 +8,17 @@ import app.main.GameBot.bot.messager.MessagerEn;
 import app.main.GameBot.bot.messager.MessagerRu;
 import app.main.GameBot.location.Location;
 import app.main.GameBot.location.LocationInit;
-import app.main.GameBot.models.Enemy;
-import app.main.GameBot.models.Fight;
-import app.main.GameBot.models.Player;
-import app.main.GameBot.models.User;
-import app.main.GameBot.repositories.EnemyRepository;
-import app.main.GameBot.repositories.FightRepository;
-import app.main.GameBot.repositories.PlayerRepository;
-import app.main.GameBot.repositories.UserRepository;
+import app.main.GameBot.models.*;
+import app.main.GameBot.repositories.*;
 import app.main.GameBot.states.UserState;
+import app.main.GameBot.talent.Talent;
+import app.main.GameBot.talent.TalentsInit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 @Component
@@ -30,6 +28,8 @@ public class FightHandler {
     private final UserRepository userRepository;
     private final MenuKeyboard menuKeyboard;
     private final LocationKeyboard locationKeyboard;
+    private final WayRepository wayRepository;
+    private final TalentsInit talentsInit;
     private Messager messager;
     private final FightKeyboard fightKeyboard;
     private final LocationInit locationInit;
@@ -188,18 +188,6 @@ public class FightHandler {
         }
         return sendMessage;
     }
-    public Boolean check_death_player(Player player){
-        if(player.getHealthNow() <= 0 ){
-            return true;
-        }
-        return false;
-    }
-    public Boolean check_death_enemy(Enemy enemy){
-        if(enemy.getHealth() <= 0 ){
-            return true;
-        }
-        return false;
-    }
     public SendMessage player_is_dead(Long chatId, String lang){
         choose_lang(lang);
         var sendMessage = new SendMessage();
@@ -221,4 +209,24 @@ public class FightHandler {
         sendMessage.setText(messager.getPlayer_step());
         return sendMessage;
     }
+    public SendMessage skills_menu(Long chatId, String lang, Player player){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        List<Way> ways = wayRepository.findWaysByPlayer(player);
+        if(ways.isEmpty()){
+            sendMessage.setText(messager.getWays_not_learned());
+            return sendMessage;
+        }
+        sendMessage.setReplyMarkup(fightKeyboard.ways_menu(lang,talentsInit.getWaysList()));
+        return sendMessage;
+    }
+    public SendMessage talents_list(Long chatId, String lang, List<Talent> talents, app.main.GameBot.way.Way way,
+                                    Player player){
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+
+        return sendMessage;
+    }
+
 }

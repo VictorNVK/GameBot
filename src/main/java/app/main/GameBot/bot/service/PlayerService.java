@@ -4,6 +4,7 @@ import app.main.GameBot.bot.handler.InventoryHandler;
 import app.main.GameBot.bot.handler.LocationHandler;
 import app.main.GameBot.bot.handler.MenuHandler;
 import app.main.GameBot.bot.handler.PlayerHandler;
+import app.main.GameBot.models.Enemy;
 import app.main.GameBot.models.Player;
 import app.main.GameBot.models.User;
 import app.main.GameBot.other.Logger;
@@ -162,6 +163,7 @@ public class PlayerService {
         }
         return messages;
     }
+
     private Talent searchTalent(String callback){
         List<Way> ways = talentsInit.getWaysList();
         for(Way way : ways){

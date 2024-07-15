@@ -10,6 +10,7 @@ import app.main.GameBot.bot.handler.MenuHandler;
 import app.main.GameBot.bot.handler.PlayerHandler;
 import app.main.GameBot.bot.service.PlayerService;
 import app.main.GameBot.other.Logger;
+import app.main.GameBot.repositories.FightRepository;
 import app.main.GameBot.repositories.ItemRepository;
 import app.main.GameBot.repositories.PlayerRepository;
 import app.main.GameBot.repositories.UserRepository;
@@ -38,6 +39,7 @@ public class Initialization {
     private final PlayerService playerService;
     private final TalentsInit talentsInit;
     private final FightService fightService;
+    private final FightRepository fightRepository;
 
     @EventListener(ContextRefreshedEvent.class)
     public void init() {
@@ -45,7 +47,7 @@ public class Initialization {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
             botsApi.registerBot(new GameBot(botConfig, locationHandler,
                     playerRepository, userRepository, menuService
-            ,playerService, playerHandler, talentsInit, fightService));
+            ,playerService, playerHandler, talentsInit, fightService, fightRepository));
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

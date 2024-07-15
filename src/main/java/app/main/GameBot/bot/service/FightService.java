@@ -1,16 +1,11 @@
 package app.main.GameBot.bot.service;
 
 import app.main.GameBot.bot.handler.FightHandler;
-import app.main.GameBot.bot.handler.LocationHandler;
-import app.main.GameBot.bot.handler.MenuHandler;
-import app.main.GameBot.bot.handler.PlayerHandler;
-import app.main.GameBot.location.LocationInit;
+import app.main.GameBot.models.Enemy;
 import app.main.GameBot.models.Player;
 import app.main.GameBot.models.User;
-import app.main.GameBot.other.Logger;
-import app.main.GameBot.repositories.UserRepository;
-import app.main.GameBot.states.UserState;
 import app.main.GameBot.talent.TalentsInit;
+import app.main.GameBot.way.Way;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodMessage;
@@ -25,13 +20,7 @@ import java.util.List;
 public class FightService {
 
     private final TalentsInit talentsInit;
-    private final UserRepository userRepository;
-    private final PlayerHandler playerHandler;
-    private final MenuHandler menuHandler;
-    private final Logger logger;
-    private final LocationInit locationInit;
     private final FightHandler fightHandler;
-    private final LocationHandler locationHandler;
 
 
     public List<BotApiMethodMessage> callback_menu_handle(Update update, User user, Player player){
@@ -39,10 +28,9 @@ public class FightService {
         var callback = update.getCallbackQuery().getData();
         var chatId = update.getCallbackQuery().getFrom().getId();
 
-        fightHandler.check_death_player(player);
-
         if(callback.startsWith("skills")){
-
+            /*Вот тут много работы будет*/
+            messages.add(fightHandler.skills_menu(chatId, user.getLanguage(), player));
         }
         if(callback.startsWith("actions")){
             messages.add(fightHandler.actions(chatId, user.getLanguage()));
@@ -53,6 +41,11 @@ public class FightService {
         }
         if(callback.startsWith("back")){
             messages.add(fightHandler.fight_menu(chatId, user.getLanguage()));
+        }
+        if(talentsInit.getWaysList().contains(searchWay(callback))){
+            messages.add(fightHandler.talents_list(chatId, user.getLanguage(), searchWay(callback).getTalents(),
+                    searchWay(callback), player));
+            return messages;
         }
 
         return messages;
@@ -81,6 +74,31 @@ public class FightService {
     public SendMessage player_step(Long chatId, String lang){
         return fightHandler.player_step(chatId, lang);
     }
+    public SendMessage player_is_dead(Long chatId, String lang){
+        return fightHandler.player_is_dead(chatId, lang);
+    }
 
+    public Boolean check_death_player(Player player){
+        if(player.getHealthNow() <= 0 ){
+            return true;
+        }
+        return false;
+    }
+    public Boolean check_death_enemy(Enemy enemy){
+        if(enemy.getHealth() <= 0 ){
+            return true;
+        }
+        return false;
+    }
+
+    private Way searchWay(String callback){
+        List<Way> ways = talentsInit.getWaysList();
+        for(Way way : ways){
+            if(way.getNameEn().equals(callback)){
+                return way;
+            }
+        }
+        return null;
+    }
 
 }

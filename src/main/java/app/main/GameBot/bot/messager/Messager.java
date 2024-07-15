@@ -84,4 +84,5 @@ public abstract class Messager {
     private String evade_is_successful;
     private String evade_is_unsuccessful;
     private String player_is_dead;
+    private String ways_not_learned;
 }
