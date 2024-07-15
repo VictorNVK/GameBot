@@ -1,6 +1,8 @@
 package app.main.GameBot.bot.handler;
 
 import app.main.GameBot.bot.keyboard.FightKeyboard;
+import app.main.GameBot.bot.keyboard.LocationKeyboard;
+import app.main.GameBot.bot.keyboard.MenuKeyboard;
 import app.main.GameBot.bot.messager.Messager;
 import app.main.GameBot.bot.messager.MessagerEn;
 import app.main.GameBot.bot.messager.MessagerRu;
@@ -13,6 +15,8 @@ import app.main.GameBot.models.User;
 import app.main.GameBot.repositories.EnemyRepository;
 import app.main.GameBot.repositories.FightRepository;
 import app.main.GameBot.repositories.PlayerRepository;
+import app.main.GameBot.repositories.UserRepository;
+import app.main.GameBot.states.UserState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -23,6 +27,9 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class FightHandler {
 
+    private final UserRepository userRepository;
+    private final MenuKeyboard menuKeyboard;
+    private final LocationKeyboard locationKeyboard;
     private Messager messager;
     private final FightKeyboard fightKeyboard;
     private final LocationInit locationInit;
@@ -83,7 +90,6 @@ public class FightHandler {
         }
         return null;
     }
-
         public SendMessage enemy_attack(Long chatId, String lang, Player player) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
@@ -163,26 +169,43 @@ public class FightHandler {
         sendMessage.setReplyMarkup(fightKeyboard.actions_keyboard(lang));
         return sendMessage;
     }
-    public SendMessage evade(Long chatId, String lang){
+    public SendMessage evade(Long chatId, String lang, User user, Player player){
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         Random random = new Random();
         int randomNumber = random.nextInt(100) + 1;
-        if (randomNumber <= 70) {
+        if (randomNumber <= 30) {
             sendMessage.setText(messager.getEvade_is_successful());
-            /*Логика с отменой боя и установкой статуса Menu для пользователя*/
+            sendMessage.setReplyMarkup(locationKeyboard.action_menu_keyboard(lang));
+            Fight fight = fightRepository.findByPlayer(player);
+            fightRepository.delete(fight);
+            enemyRepository.delete(fight.getEnemy());
+            user.setUserState(UserState.MENU);
+            userRepository.save(user);
         } else {
             sendMessage.setText(messager.getEvade_is_unsuccessful());
-            /*Тут хз пока что*/
         }
         return sendMessage;
     }
-    private Boolean check_death(Long chatId, String lang, Player player, Enemy enemy){
+    public Boolean check_death_player(Player player){
+        if(player.getHealthNow() <= 0 ){
+            return true;
+        }
+        return false;
+    }
+    public Boolean check_death_enemy(Enemy enemy){
+        if(enemy.getHealth() <= 0 ){
+            return true;
+        }
+        return false;
+    }
+    public SendMessage player_is_dead(Long chatId, String lang){
+        choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-
-        return true;
+        sendMessage.setText(messager.getPlayer_is_dead());
+        return sendMessage;
     }
     public SendMessage enemy_step(Long chatId, String lang){
         choose_lang(lang);

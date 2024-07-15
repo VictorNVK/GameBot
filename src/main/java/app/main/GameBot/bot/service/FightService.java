@@ -1,6 +1,7 @@
 package app.main.GameBot.bot.service;
 
 import app.main.GameBot.bot.handler.FightHandler;
+import app.main.GameBot.bot.handler.LocationHandler;
 import app.main.GameBot.bot.handler.MenuHandler;
 import app.main.GameBot.bot.handler.PlayerHandler;
 import app.main.GameBot.location.LocationInit;
@@ -8,6 +9,7 @@ import app.main.GameBot.models.Player;
 import app.main.GameBot.models.User;
 import app.main.GameBot.other.Logger;
 import app.main.GameBot.repositories.UserRepository;
+import app.main.GameBot.states.UserState;
 import app.main.GameBot.talent.TalentsInit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -29,6 +31,7 @@ public class FightService {
     private final Logger logger;
     private final LocationInit locationInit;
     private final FightHandler fightHandler;
+    private final LocationHandler locationHandler;
 
 
     public List<BotApiMethodMessage> callback_menu_handle(Update update, User user, Player player){
@@ -36,19 +39,21 @@ public class FightService {
         var callback = update.getCallbackQuery().getData();
         var chatId = update.getCallbackQuery().getFrom().getId();
 
+        fightHandler.check_death_player(player);
+
         if(callback.startsWith("skills")){
 
         }
         if(callback.startsWith("actions")){
             messages.add(fightHandler.actions(chatId, user.getLanguage()));
+
         }
         if(callback.startsWith("evade")){
-
+            messages.add(fightHandler.evade(chatId, user.getLanguage(), user, player));
         }
         if(callback.startsWith("back")){
             messages.add(fightHandler.fight_menu(chatId, user.getLanguage()));
         }
-
 
         return messages;
     }

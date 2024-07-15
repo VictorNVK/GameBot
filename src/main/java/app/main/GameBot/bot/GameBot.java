@@ -1,5 +1,6 @@
 package app.main.GameBot.bot;
 import app.main.GameBot.bot.config.BotConfig;
+import app.main.GameBot.bot.handler.FightHandler;
 import app.main.GameBot.bot.handler.LocationHandler;
 import app.main.GameBot.bot.handler.PlayerHandler;
 import app.main.GameBot.bot.service.FightService;
@@ -189,12 +190,15 @@ public class GameBot extends TelegramLongPollingBot {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                user.setUserState(UserState.FIGHT_AWAIT);
-                userRepository.save(user);
-                try {
-                    enemy_step(user);
-                } catch (TelegramApiException e) {
-                    throw new RuntimeException(e);
+                User user1 = userRepository.findUserByChatId(user.getChatId());
+                if(user1.getUserState().equals(UserState.FIGHT)) {
+                    user1.setUserState(UserState.FIGHT_AWAIT);
+                    userRepository.save(user);
+                    try {
+                        enemy_step(user);
+                    } catch (TelegramApiException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             });
         }
@@ -210,15 +214,18 @@ public class GameBot extends TelegramLongPollingBot {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                user.setUserState(UserState.FIGHT);
-                userRepository.save(user);
-                try {
-                    execute(fightService.enemy_attack(chatId, user.getLanguage(), player));
-                    execute(fightService.sendCharacteristics(chatId, user.getLanguage(), player));
-                    execute(fightService.fight_menu(chatId, user.getLanguage()));
-                    player_step(user);
-                } catch (TelegramApiException e) {
-                    throw new RuntimeException(e);
+                User user1 = userRepository.findUserByChatId(user.getChatId());
+                if(user1.getUserState().equals(UserState.FIGHT_AWAIT)) {
+                    user.setUserState(UserState.FIGHT);
+                    userRepository.save(user);
+                    try {
+                        execute(fightService.enemy_attack(chatId, user.getLanguage(), player));
+                        execute(fightService.sendCharacteristics(chatId, user.getLanguage(), player));
+                        execute(fightService.fight_menu(chatId, user.getLanguage()));
+                        player_step(user);
+                    } catch (TelegramApiException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             });
         }

@@ -35,7 +35,6 @@ public class LocationHandler {
     private final Logger logger;
     private final LocationInit locationInit;
     private final UserRepository userRepository;
-    private final FightService fightService;
 
 
     private void choose_lang(String lang) {
