@@ -1,6 +1,6 @@
 package app.main.GameBot.talent;
 
-import app.main.GameBot.enemy.Enemy;
+import app.main.GameBot.models.Enemy;
 import app.main.GameBot.models.Player;
 import lombok.Getter;
 
@@ -17,8 +17,13 @@ public class MagicShot extends Talent {
 
     private final Integer unlocked_way_level = 1;
 
-    public void action_attack(Enemy enemy, Player player, app.main.GameBot.models.Talent talent){
-
+    public app.main.GameBot.models.Enemy action_attack(Enemy enemy, Player player, app.main.GameBot.models.Talent talent){
+        var enemyDefense = enemy.getDefense();
+        var level = talent.getLevel();
+        var damage = 2 + (level * 1);
+        var attack = player.getAttack() + damage - enemyDefense;
+        enemy.setHealth(enemy.getHealth() - attack);
+        return enemy;
     }
 
     public Integer action_defense(Integer damage, Integer level){

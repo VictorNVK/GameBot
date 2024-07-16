@@ -20,7 +20,7 @@ public abstract class Talent {
     private Integer unlocked_way_level;
 
 
-    public Enemy action_attack(Enemy enemy ,Player player, app.main.GameBot.models.Talent talent){
+    public app.main.GameBot.models.Enemy action_attack(Enemy enemy, Player player, app.main.GameBot.models.Talent talent){
         return enemy;
     }
 

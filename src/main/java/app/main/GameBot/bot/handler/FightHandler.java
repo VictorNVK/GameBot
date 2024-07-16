@@ -281,6 +281,9 @@ public class FightHandler {
         app.main.GameBot.models.Talent talentModel = talentRepository.findTalentByPlayerAndName(player, talent.getNameEn());
         Enemy enemy = fight.getEnemy();
         enemy = talent.action_attack(enemy, player, talentModel);
+        if(enemy.getHealth() < 0){
+            enemy.setHealth(0);
+        }
         player = talent.action_price(player, talentModel);
         playerRepository.save(player);
         enemyRepository.save(enemy);
@@ -303,7 +306,7 @@ public class FightHandler {
         return sendMessage;
     }
 
-    public SendMessage enemy_dead(Long chatId, String lang, User user, Player player){
+    public SendMessage enemy_dead(Long chatId, String lang, Player player){
         choose_lang(lang);
         var sendMessage = new SendMessage();
         Fight fight = fightRepository.findByPlayer(player);

@@ -4,7 +4,6 @@ import app.main.GameBot.models.Enemy;
 import app.main.GameBot.models.Player;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 
 @Getter
 @Setter
@@ -28,7 +27,6 @@ public class Slayer extends Talent {
         enemy.setHealth(enemy.getHealth() - attack);
         return enemy;
     }
-
 
     public Integer action_defense(Integer damage, Integer level){
         return damage;

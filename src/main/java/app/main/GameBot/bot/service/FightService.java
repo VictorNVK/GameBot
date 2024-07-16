@@ -60,7 +60,7 @@ public class FightService {
                 messages.add(fightHandler.use_skill(chatId, user.getLanguage(),player, user, talent));
                 messages.add(fightHandler.enemy_characteristics(chatId, user.getLanguage(), player));
                 if(fightRepository.findByPlayer(player).getEnemy().getHealth() <=0){
-                    messages.add(fightHandler.enemy_dead(chatId, user.getLanguage(), user, player));
+                    messages.add(fightHandler.enemy_dead(chatId, user.getLanguage(), player));
                     messages.add(menuHandler.menu(chatId, user.getLanguage()));
                     user.setUserState(UserState.MENU);
                     userRepository.save(user);
