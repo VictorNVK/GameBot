@@ -2,12 +2,8 @@ package app.main.GameBot.enemy;
 
 import app.main.GameBot.models.Player;
 import app.main.GameBot.talent.Talent;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
-public abstract class Enemy {
+public class Skeleton {
 
     private Integer health;
 
@@ -22,13 +18,11 @@ public abstract class Enemy {
     private String nameRu;
 
 
-    public Player attack(Player player, app.main.GameBot.models.Enemy enemy, Talent talent
-    ,Integer talentLevel){
+    public Player attack(Player player, app.main.GameBot.models.Enemy enemy, Talent talent){
         return null;
     }
 
-    public Player attack_talent(Player player, Integer counter, app.main.GameBot.models.Enemy enemy, Talent talent
-    ,Integer talentLevel){
+    public Player attack_talent(Player player, Integer counter, app.main.GameBot.models.Enemy enemy, Talent talent){
         return null;
     }
     public Boolean talent_condition(Player player, Integer counter, app.main.GameBot.models.Enemy enemy){
@@ -41,5 +35,13 @@ public abstract class Enemy {
 
     public app.main.GameBot.models.Enemy talent_price(app.main.GameBot.models.Enemy enemy){
         return enemy;
+    }
+
+    public app.main.GameBot.models.Enemy toModel(Enemy enemy, app.main.GameBot.models.Enemy enemy_model){
+        enemy_model.setAttack(this.attack);
+        enemy_model.setEnergy(this.energy);
+        enemy_model.setHealth(this.health);
+        enemy_model.setDefense(this.defense);
+        return enemy_model;
     }
 }

@@ -85,4 +85,11 @@ public abstract class Messager {
     private String evade_is_unsuccessful;
     private String player_is_dead;
     private String ways_not_learned;
+    private String talents_not_learned;
+    private String not_resources;
+    private String skill_is_choosen;
+    private String await_your_step;
+    private String enemy_stats;
+    private String enemy_is_dead;
+    private String crystal;
 }

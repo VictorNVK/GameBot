@@ -21,10 +21,9 @@ public class MagicShot extends Talent {
 
     }
 
-    public void action_defense(){
-
+    public Integer action_defense(Integer damage, Integer level){
+        return damage ;
     }
-
     public String descriptionRu(app.main.GameBot.models.Talent talent){
         var level = talent.getLevel();
         var damage = 2 + (level * 1);
@@ -42,5 +41,8 @@ public class MagicShot extends Talent {
         var energy = 5 * level;
         return "Elemental strike: attack +\"+ damage + \", consumption\" + energy + \"energy\";";
     }
+    public Boolean check_resources(Player player, app.main.GameBot.models.Talent talent){
 
+        return true;
+    }
 }

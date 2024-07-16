@@ -21,8 +21,8 @@ public class Suppression extends Talent{
 
     }
 
-    public void action_defense(){
-
+    public Integer action_defense(Integer damage, Integer level){
+        return damage ;
     }
     public String descriptionRu(app.main.GameBot.models.Talent talent){
         var level = talent.getLevel();
@@ -36,5 +36,8 @@ public class Suppression extends Talent{
         var block = 20 + level * 5;
         var energy =  level * 5;
         return "Suppression damage - " + block + "%" + "|" + "Energy consumption - " + energy;
+    }
+    public Boolean check_resources(Player player, app.main.GameBot.models.Talent talent){
+        return true;
     }
 }

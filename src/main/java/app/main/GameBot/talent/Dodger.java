@@ -8,6 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Dodger extends Talent{
+
     private String nameRu = "Уклонение";
 
     private String nameEn = "Dodger";
@@ -23,10 +24,9 @@ public class Dodger extends Talent{
 
     }
 
-    public void action_defense(){
-
+    public Integer action_defense(Integer damage, Integer level){
+        return damage ;
     }
-
     public String descriptionRu(app.main.GameBot.models.Talent talent){
         var level = talent.getLevel();
         var miss = 2 * level;
@@ -51,5 +51,9 @@ public class Dodger extends Talent{
         }
         return "Dodge chance: " + miss + "%\uD83D\uDCA8" + " " + " Energy consumption " + energy + "⚡\uFE0F" +
                 "\n + Cannot be turned off until the end of the battle or until the energy runs out!";
+    }
+    public Boolean check_resources(Player player, app.main.GameBot.models.Talent talent){
+
+        return true;
     }
 }

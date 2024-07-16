@@ -84,5 +84,12 @@ public class MessagerRu extends Messager {
     private final String evade_is_unsuccessful = "Побег не удался, бой продолжается❌";
     private final String player_is_dead = "Вы умерли☠\uFE0F";
     private final String ways_not_learned = "У вас не изучена ни одна ветка!";
+    private final String talents_not_learned = "У вас не изученных навыков!";
+    private final String not_resources = "Недостаточно ресурсов для применения навыка!";
+    private final String skill_is_choosen = "Навык выбран✅";
+    private final String await_your_step = "Действие выполнено, ожидайте свой ход...";
+    private final String enemy_stats = "Характеристики врага: ";
+    private final String enemy_is_dead = "Враг повержен! Вот награда\n";
+    private final String crystal = "кристалл";
 }
 

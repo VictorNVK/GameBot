@@ -1,7 +1,7 @@
 package app.main.GameBot.enemy;
 
 import app.main.GameBot.models.Player;
-import app.main.GameBot.repositories.EnemyRepository;
+import app.main.GameBot.talent.Talent;
 import lombok.Getter;
 
 @Getter
@@ -21,10 +21,13 @@ public class Wolf extends Enemy{
 
 
 
-    public Player attack(Player player, app.main.GameBot.models.Enemy enemy){
+    public Player attack(Player player, app.main.GameBot.models.Enemy enemy, Talent talent, Integer talentLevel){
         var damage = enemy.getAttack() - player.getDefense();
         if(damage< 0){
             damage = 0;
+        }
+        if(talent != null) {
+            damage = talent.action_defense(damage, talentLevel);
         }
         player.setHealthNow(player.getHealthNow() - damage);
         return player;
@@ -38,8 +41,7 @@ public class Wolf extends Enemy{
     }
 
 
-
-    public Player attack_talent(Player player, Integer counter, app.main.GameBot.models.Enemy enemy){
+    public Player attack_talent(Player player, Integer counter, app.main.GameBot.models.Enemy enemy, Talent talent, Integer talentLevel){
             player.setHealthNow(player.getHealthNow() - attack * 2);
         return player;
     }

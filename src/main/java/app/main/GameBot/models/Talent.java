@@ -29,4 +29,7 @@ public class Talent {
 
     @Column
     private Boolean active = false;
+
+    @Column
+    private Integer counter;
 }

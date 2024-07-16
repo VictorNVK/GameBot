@@ -127,6 +127,7 @@ public class PlayerHandler {
         talentModel.setPlayer(player);
         talentModel.setName(talent.getNameEn());
         talentModel.setLevel(talentModel.getLevel());
+        talentModel.setCounter(talent.getActive_time());
 
         talentRepository.save(talentModel);
         player.setLastTalent(talent.getNameEn());
@@ -168,9 +169,11 @@ public class PlayerHandler {
                     var way_name = way.getNameEn();
                     if(way_name.equals("Sword way")){
                         player.setHealth(player.getHealth() + 10);
+                        player.setHealthNow(player.getHealthNow() + 10);
 
                     }else if(way_name.equals("Magus way")){
                         player.setEnergy(player.getEnergy() + 10);
+                        player.setEnergyNow(player.getEnergyNow() +10);
                     }
                     else if(way_name.equals("Word way")){
                         player.setEnergy(player.getEnergy() + 5);
