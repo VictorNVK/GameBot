@@ -1,11 +1,9 @@
 package app.main.GameBot.bot.keyboard;
 
-import app.main.GameBot.models.Player;
 import app.main.GameBot.repositories.TalentRepository;
 import app.main.GameBot.talent.Talent;
 import app.main.GameBot.way.Way;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.codec.language.bm.Lang;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -18,7 +16,6 @@ import java.util.List;
 public class FightKeyboard extends Keyboard{
 
     private final TalentRepository talentRepository;
-
 
     public InlineKeyboardMarkup action_menu(String lang){
         choose_lang(lang);
@@ -83,18 +80,20 @@ public class FightKeyboard extends Keyboard{
         choose_lang(lang);
         var keyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-        for (int i = 0; i < talents.size(); i++) {
-            if (talents.get(i).getUnlocked_way_level() <= way.getLevel()) {
-                List<InlineKeyboardButton> row1 = new ArrayList<>();
-                var button1 = new InlineKeyboardButton();
-                if (lang.equals("rus")) {
-                    button1.setText(talents.get(i).getNameRu());
-                } else if (lang.equals("eng")) {
-                    button1.setText(talents.get(i).getNameEn());
+        if(way != null) {
+            for (int i = 0; i < talents.size(); i++) {
+                if (talents.get(i).getUnlocked_way_level() <= way.getLevel()) {
+                    List<InlineKeyboardButton> row1 = new ArrayList<>();
+                    var button1 = new InlineKeyboardButton();
+                    if (lang.equals("rus")) {
+                        button1.setText(talents.get(i).getNameRu());
+                    } else if (lang.equals("eng")) {
+                        button1.setText(talents.get(i).getNameEn());
+                    }
+                    button1.setCallbackData("choose_" + talents.get(i).getNameEn());
+                    row1.add(button1);
+                    rows.add(row1);
                 }
-                button1.setCallbackData("choose_" +  talents.get(i).getNameEn());
-                row1.add(button1);
-                rows.add(row1);
             }
         }
         List<InlineKeyboardButton> row2 = new ArrayList<>();

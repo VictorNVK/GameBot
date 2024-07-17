@@ -45,9 +45,8 @@ public class TalentsInit {
         way3.setNameRu("Путь слова");
         way3.setNameEn("Word way");
         Suppression suppression = new Suppression();
-
         word_way.add(suppression);
-
+        way3.setTalents(word_way);
         waysList.add(way);
         waysList.add(way2);
         waysList.add(way3);

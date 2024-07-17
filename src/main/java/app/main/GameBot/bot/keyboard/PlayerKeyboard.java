@@ -154,7 +154,40 @@ public class PlayerKeyboard extends Keyboard {
         keyboardMarkup.setKeyboard(rows);
         return keyboardMarkup;
     }
+    public InlineKeyboardMarkup regeneration_menu(String lang){
+        choose_lang(lang);
+        var keyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        List<InlineKeyboardButton> row1 = new ArrayList<>();
+        var button1 = new InlineKeyboardButton();
+        button1.setText(messager.getHealing());
+        button1.setCallbackData("healing");
+        row1.add(button1);
+        rows.add(row1);
 
+        List<InlineKeyboardButton> row2 = new ArrayList<>();
+        var back = new InlineKeyboardButton();
+        back.setText(messager.getBack());
+        back.setCallbackData("back");
+        row2.add(back);
+        rows.add(row2);
 
+        keyboardMarkup.setKeyboard(rows);
+        return keyboardMarkup;
+    }
+    public InlineKeyboardMarkup stop_regeneration(String lang){
+        choose_lang(lang);
+        var keyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
+        List<InlineKeyboardButton> row2 = new ArrayList<>();
+        var back = new InlineKeyboardButton();
+        back.setText(messager.getBack());
+        back.setCallbackData("back");
+        row2.add(back);
+        rows.add(row2);
+
+        keyboardMarkup.setKeyboard(rows);
+        return keyboardMarkup;
+    }
 }

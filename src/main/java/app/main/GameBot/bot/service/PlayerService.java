@@ -4,12 +4,13 @@ import app.main.GameBot.bot.handler.InventoryHandler;
 import app.main.GameBot.bot.handler.LocationHandler;
 import app.main.GameBot.bot.handler.MenuHandler;
 import app.main.GameBot.bot.handler.PlayerHandler;
-import app.main.GameBot.models.Enemy;
 import app.main.GameBot.models.Player;
 import app.main.GameBot.models.User;
 import app.main.GameBot.other.Logger;
 import app.main.GameBot.repositories.ItemRepository;
+import app.main.GameBot.repositories.PlayerRepository;
 import app.main.GameBot.repositories.UserRepository;
+import app.main.GameBot.states.UserState;
 import app.main.GameBot.talent.Talent;
 import app.main.GameBot.talent.TalentsInit;
 import app.main.GameBot.way.Way;
@@ -21,6 +22,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class PlayerService {
     private final Logger logger;
     private final ItemRepository itemRepository;
     private final LocationHandler locationHandler;
+    private final PlayerRepository playerRepository;
     private User _user;
     private Player _player;
     private final TalentsInit talentsInit;
@@ -161,6 +165,15 @@ public class PlayerService {
             messages.add(playerHandler.your_balance(chatId, user.getLanguage(), player.getCrystals()));
             return messages;
         }
+        if(callback.startsWith("regeneration")){
+            messages.add(playerHandler.regeneration_menu(chatId, user.getLanguage()));
+        }
+        if(callback.startsWith("healing")){
+            user.setUserState(UserState.HEALING);
+            messages.add(playerHandler.regeneration_stop(chatId, user.getLanguage()));
+            userRepository.save(user);
+            healing(user, player);
+        }
         return messages;
     }
 
@@ -183,5 +196,33 @@ public class PlayerService {
             }
         }
         return null;
+    }
+
+    private void healing(User user, Player player) {
+        if (user.getUserState().equals(UserState.HEALING)) {
+            CompletableFuture.runAsync(() -> {
+                try {
+                    TimeUnit.SECONDS.sleep(15);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if(user.getUserState().equals(UserState.HEALING)) {
+                    if(player.getHealthNow() < player.getHealth()) {
+                        player.setHealthNow(player.getHealthNow() + player.getHealthRegeneration());
+                    }
+                    if(player.getEnergyNow() < player.getEnergy()) {
+                        player.setEnergyNow(player.getEnergyNow() + player.getEnergyNow());
+                    }
+                    if(player.getBloodNow() < player.getBlood()) {
+                        player.setBloodNow(player.getBloodNow() + player.getBloodRegeneration());
+                    }
+                    if(player.getBarrierNow() < player.getBarrier()){
+                        player.setBarrierNow(player.getBarrierNow() + 1);
+                    }
+                    playerRepository.save(player);
+                    healing(user, player);
+                }
+            });
+        }
     }
 }

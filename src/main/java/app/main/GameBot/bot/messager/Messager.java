@@ -92,4 +92,8 @@ public abstract class Messager {
     private String enemy_stats;
     private String enemy_is_dead;
     private String crystal;
+    private String talent_is_not_learned;
+    private String healing;
+    private String stop_regeneration;
+    private String regen_was_stopped;
 }

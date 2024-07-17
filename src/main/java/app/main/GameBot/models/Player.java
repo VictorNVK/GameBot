@@ -30,6 +30,8 @@ public class Player {
     @Column
     private Integer barrier = 0;
 
+    private Integer barrierNow = 0;
+
     @Column
     private Integer health = 20;
 

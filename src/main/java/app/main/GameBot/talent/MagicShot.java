@@ -34,9 +34,9 @@ public class MagicShot extends Talent {
         var damage = 2 + (level * 1);
         var energy = 5;
         if(level >=2 && level % 2 == 0) {
-            energy = energy + level /2;
+            energy = energy + level / 2;
         }else {
-            energy = energy + level/2;
+            energy = energy + level / 2;
         }
         return "Стихийный удар: атака +"+ damage + ", расход " + energy + " энергии⚡\uFE0F";
     }
@@ -44,10 +44,18 @@ public class MagicShot extends Talent {
         var level = talent.getLevel();
         var damage = level * 2;
         var energy = 5 * level;
-        return "Elemental strike: attack +\"+ damage + \", consumption\" + energy + \"energy\";";
+        return "Elemental strike: attack +" + damage + ", consumption + energy " + energy;
     }
-    public Boolean check_resources(Player player, app.main.GameBot.models.Talent talent){
-
-        return true;
+    public Boolean check_resources(Player player, Integer level){
+        var energy = 5;
+        if(level >=2 && level % 2 == 0) {
+            energy = energy + level /2;
+        }else {
+            energy = energy + level/2;
+        }
+        if(player.getEnergyNow() >= energy) {
+            return true;
+        }
+        return false;
     }
 }

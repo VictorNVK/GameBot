@@ -11,15 +11,12 @@ import app.main.GameBot.location.LocationInit;
 import app.main.GameBot.models.*;
 import app.main.GameBot.repositories.*;
 import app.main.GameBot.states.UserState;
-import app.main.GameBot.talent.Suppression;
 import app.main.GameBot.talent.Talent;
 import app.main.GameBot.talent.TalentsInit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
-import java.nio.channels.Pipe;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -93,7 +90,8 @@ public class FightHandler {
         }
         return null;
     }
-        public SendMessage enemy_attack(Long chatId, String lang, Player player) {
+
+    public SendMessage enemy_attack(Long chatId, String lang, Player player) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -103,30 +101,30 @@ public class FightHandler {
         Enemy enemy_model = fight.getEnemy();
         Random random = new Random();
         var number = random.nextInt(2);
-            List<app.main.GameBot.models.Talent> talents = talentRepository.findTalentsByPlayerAndActive(player, true);
-            Talent talent = null;
-            var talentLevel = 0;
-            if (!talents.isEmpty()) {
-                for (app.main.GameBot.models.Talent talent1 : talents) {
-                    talent1.setCounter(talent1.getCounter() - 1);
-                    talent = searchTalent(talent1.getName());
-                    if (talent1.getCounter() <= 0 && talent.getType().equals("defense")) {
-                        talent1.setActive(false);
-                        talentRepository.save(talent1);
-                    }
+        List<app.main.GameBot.models.Talent> talents = talentRepository.findTalentsByPlayerAndActive(player, true);
+        Talent talent = null;
+        var talentLevel = 0;
+        if (!talents.isEmpty()) {
+            for (app.main.GameBot.models.Talent talent1 : talents) {
+                talent1.setCounter(talent1.getCounter() - 1);
+                talent = searchTalent(talent1.getName());
+                if (talent1.getCounter() == 0 && talent.getType().equals("defense")) {
+                    talent1.setActive(false);
+                    talentRepository.save(talent1);
                 }
-                 talent = searchTalent(talents.getLast().getName());
-                 talentLevel = talents.getLast().getLevel();
+                talentRepository.save(talent1);
             }
-
+            talent = searchTalent(talents.getLast().getName());
+            talentLevel = talents.getLast().getLevel();
+        }
         if (number == 1) {
             player = enemy.attack(player, enemy_model, talent, talentLevel);
             sendMessage.setText(messager.getEnemy_use_attack());
-        } else if(enemy.talent_condition(player, fight.getCounter(), enemy_model)) {
+        } else if (enemy.talent_condition(player, fight.getCounter(), enemy_model)) {
             player = enemy.attack_talent(player, fight.getCounter(), enemy_model, talent, talentLevel);
             enemy_model = enemy.talent_price(enemy_model);
             sendMessage.setText(messager.getEnemy_use_skill());
-        }else {
+        } else {
             player = enemy.attack(player, enemy_model, talent, talentLevel);
             sendMessage.setText(messager.getEnemy_use_attack());
         }
@@ -169,11 +167,11 @@ public class FightHandler {
                 + "\n" + messager.getBlood() + player.getBloodNow() + "/" + player.getBlood() + "\uD83E\uDE78"
                 + "\n" + messager.getAttack() + player.getAttack() + "\uD83D\uDDE1"
                 + "\n" + messager.getDefense() + player.getDefense() + "\uD83D\uDEE1"
-                + "\n" + messager.getBarrier() + player.getBarrier() + "\uD83D\uDD35");
-
+                + "\n" + messager.getBarrier() + player.getBarrierNow() + "/" + player.getBarrier() + "\uD83D\uDD35");
         return sendMessage;
     }
-    public SendMessage fight_menu(Long chatId, String lang){
+
+    public SendMessage fight_menu(Long chatId, String lang) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -181,7 +179,8 @@ public class FightHandler {
         sendMessage.setReplyMarkup(fightKeyboard.action_menu(lang));
         return sendMessage;
     }
-    public SendMessage actions(Long chatId, String lang){
+
+    public SendMessage actions(Long chatId, String lang) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -189,7 +188,8 @@ public class FightHandler {
         sendMessage.setReplyMarkup(fightKeyboard.actions_keyboard(lang));
         return sendMessage;
     }
-    public SendMessage evade(Long chatId, String lang, User user, Player player){
+
+    public SendMessage evade(Long chatId, String lang, User user, Player player) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -208,42 +208,47 @@ public class FightHandler {
         }
         return sendMessage;
     }
-    public SendMessage player_is_dead(Long chatId, String lang){
+
+    public SendMessage player_is_dead(Long chatId, String lang) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(messager.getPlayer_is_dead());
         return sendMessage;
     }
-    public SendMessage enemy_step(Long chatId, String lang){
+
+    public SendMessage enemy_step(Long chatId, String lang) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(messager.getEnemy_step());
         return sendMessage;
     }
-    public SendMessage player_step(Long chatId, String lang){
+
+    public SendMessage player_step(Long chatId, String lang) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(messager.getPlayer_step());
         return sendMessage;
     }
-    public SendMessage skills_menu(Long chatId, String lang, Player player){
+
+    public SendMessage skills_menu(Long chatId, String lang, Player player) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         List<Way> ways = wayRepository.findWaysByPlayer(player);
-        if(ways.isEmpty()){
+        if (ways.isEmpty()) {
             sendMessage.setText(messager.getWays_not_learned());
             return sendMessage;
         }
         sendMessage.setText(messager.getChoose_param_of_menu());
-        sendMessage.setReplyMarkup(fightKeyboard.ways_menu(lang,talentsInit.getWaysList()));
+        sendMessage.setReplyMarkup(fightKeyboard.ways_menu(lang, talentsInit.getWaysList()));
         return sendMessage;
     }
+
     public SendMessage talents_list(Long chatId, String lang, List<Talent> talents, app.main.GameBot.way.Way way,
-                                    Player player){
+                                    Player player) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -253,7 +258,8 @@ public class FightHandler {
 
         return sendMessage;
     }
-    public SendMessage no_resources(Long chatId, String lang){
+
+    public SendMessage no_resources(Long chatId, String lang) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -261,19 +267,20 @@ public class FightHandler {
         return sendMessage;
     }
 
-    public SendMessage choose_talent(Long chatId, String lang, Talent talent, Player player){
+    public SendMessage choose_talent(Long chatId, String lang, Talent talent, Player player) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(messager.getSkill_is_choosen());
         app.main.GameBot.models.Talent talentModel = talentRepository.findTalentByPlayerAndName(player,
                 talent.getNameEn());
-            talentModel.setActive(true);
-            talentRepository.save(talentModel);
+        talentModel.setActive(true);
+        talentModel.setCounter(talent.getActive_time());
+        talentRepository.save(talentModel);
         return sendMessage;
     }
 
-    public SendMessage use_skill(Long chatId, String lang, Player player, User user, Talent talent){
+    public SendMessage use_skill(Long chatId, String lang, Player player, User user, Talent talent) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -281,7 +288,7 @@ public class FightHandler {
         app.main.GameBot.models.Talent talentModel = talentRepository.findTalentByPlayerAndName(player, talent.getNameEn());
         Enemy enemy = fight.getEnemy();
         enemy = talent.action_attack(enemy, player, talentModel);
-        if(enemy.getHealth() < 0){
+        if (enemy.getHealth() < 0) {
             enemy.setHealth(0);
         }
         player = talent.action_price(player, talentModel);
@@ -292,7 +299,8 @@ public class FightHandler {
         sendMessage.setText(messager.getAwait_your_step());
         return sendMessage;
     }
-    public SendMessage enemy_characteristics(Long chatId, String lang, Player player){
+
+    public SendMessage enemy_characteristics(Long chatId, String lang, Player player) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         Fight fight = fightRepository.findByPlayer(player);
@@ -306,7 +314,7 @@ public class FightHandler {
         return sendMessage;
     }
 
-    public SendMessage enemy_dead(Long chatId, String lang, Player player){
+    public SendMessage enemy_dead(Long chatId, String lang, Player player) {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         Fight fight = fightRepository.findByPlayer(player);
@@ -321,11 +329,19 @@ public class FightHandler {
         return sendMessage;
     }
 
-    private Talent searchTalent(String callback){
+    public SendMessage talent_not_learned(Long chatId, String lang) {
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setText(messager.getTalents_not_learned());
+        sendMessage.setChatId(chatId);
+        return sendMessage;
+    }
+
+    private Talent searchTalent(String callback) {
         List<app.main.GameBot.way.Way> ways = talentsInit.getWaysList();
-        for(app.main.GameBot.way.Way way : ways){
-            for(Talent talent:way.getTalents()){
-                if(talent.getNameEn().equals(callback)){
+        for (app.main.GameBot.way.Way way : ways) {
+            for (Talent talent : way.getTalents()) {
+                if (talent.getNameEn().equals(callback)) {
                     return talent;
                 }
             }

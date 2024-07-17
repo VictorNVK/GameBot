@@ -20,24 +20,28 @@ public abstract class Talent {
     private Integer unlocked_way_level;
 
 
-    public app.main.GameBot.models.Enemy action_attack(Enemy enemy, Player player, app.main.GameBot.models.Talent talent){
+    public app.main.GameBot.models.Enemy action_attack(Enemy enemy, Player player, app.main.GameBot.models.Talent talent) {
         return enemy;
     }
 
-    public Player action_price(Player player, app.main.GameBot.models.Talent talent){
+    public Player action_price(Player player, app.main.GameBot.models.Talent talent) {
 
         return player;
     }
-    public Integer action_defense(Integer damage, Integer talentLevel){
+
+    public Integer action_defense(Integer damage, Integer talentLevel) {
         return damage;
     }
-    public String descriptionRu(app.main.GameBot.models.Talent talent){
+
+    public String descriptionRu(app.main.GameBot.models.Talent talent) {
         return "";
     }
-    public String descriptionEn(app.main.GameBot.models.Talent talent){
+
+    public String descriptionEn(app.main.GameBot.models.Talent talent) {
         return "";
     }
-    public Boolean check_resources(Player player, Integer level){
+
+    public Boolean check_resources(Player player, Integer level) {
         return true;
     }
 }

@@ -29,7 +29,7 @@ public abstract class Enemy {
 
     public Player attack_talent(Player player, Integer counter, app.main.GameBot.models.Enemy enemy, Talent talent
     ,Integer talentLevel){
-        return null;
+        return player;
     }
     public Boolean talent_condition(Player player, Integer counter, app.main.GameBot.models.Enemy enemy){
         return true;

@@ -1,8 +1,8 @@
 package app.main.GameBot.bot;
 
 import app.main.GameBot.bot.config.BotConfig;
-import app.main.GameBot.bot.handler.FightHandler;
 import app.main.GameBot.bot.handler.LocationHandler;
+import app.main.GameBot.bot.handler.MenuHandler;
 import app.main.GameBot.bot.handler.PlayerHandler;
 import app.main.GameBot.bot.service.FightService;
 import app.main.GameBot.bot.service.MenuService;
@@ -13,9 +13,7 @@ import app.main.GameBot.repositories.FightRepository;
 import app.main.GameBot.repositories.PlayerRepository;
 import app.main.GameBot.repositories.UserRepository;
 import app.main.GameBot.states.UserState;
-import app.main.GameBot.talent.Talent;
 import app.main.GameBot.talent.TalentsInit;
-import app.main.GameBot.way.Way;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.springframework.scheduling.annotation.Async;
@@ -29,7 +27,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 /*Главный метод бота. Здесь обрабатываются все обновления от клиента, после чего вызываются нужные хендлеры
  * для дальнейшей обработки и обновления*/
@@ -113,7 +110,6 @@ public class GameBot extends TelegramLongPollingBot {
         var callback = update.getCallbackQuery().getData();
         var chatId = update.getCallbackQuery().getFrom().getId();
 
-
         if (user.getUserState() == null) {
             sendMessages(menuService.callback_menu_handle(update, user));
             return;
@@ -179,9 +175,17 @@ public class GameBot extends TelegramLongPollingBot {
             return;
         }
         if (user.getUserState().equals(UserState.FIGHT_AWAIT)) {
-            if(fightRepository.findByPlayer(player) == null){
+            if (fightRepository.findByPlayer(player) == null) {
                 user.setUserState(UserState.MENU);
                 userRepository.save(user);
+            }
+        }
+        if (user.getUserState().equals(UserState.HEALING)) {
+            if (callback.startsWith("back")) {
+                execute(playerHandler.regeneration_was_stopped(chatId, user.getLanguage()));
+                user.setUserState(UserState.MENU);
+                userRepository.save(user);
+                execute(playerHandler.sendCharacteristics(chatId, user.getLanguage(), player));
             }
         }
     }
@@ -206,7 +210,6 @@ public class GameBot extends TelegramLongPollingBot {
                         } else {
                             user.setUserState(UserState.MENU);
                             userRepository.save(user);
-                            /*Победа игрока, игрок получает награду*/
                         }
                     } catch (TelegramApiException e) {
                         throw new RuntimeException(e);

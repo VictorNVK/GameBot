@@ -20,9 +20,12 @@ public class Wolf extends Enemy{
     private String nameRu = "Волк";
 
 
-
     public Player attack(Player player, app.main.GameBot.models.Enemy enemy, Talent talent, Integer talentLevel){
         var damage = enemy.getAttack() - player.getDefense();
+        if(player.getBarrierNow() > 0) {
+            damage = damage - player.getBarrierNow();
+            player.setBarrierNow(player.getBarrierNow() - damage);
+        }
         if(damage< 0){
             damage = 0;
         }
@@ -42,7 +45,10 @@ public class Wolf extends Enemy{
 
 
     public Player attack_talent(Player player, Integer counter, app.main.GameBot.models.Enemy enemy, Talent talent, Integer talentLevel){
-            player.setHealthNow(player.getHealthNow() - attack * 2);
+        attack = attack * player.getLevel();
+        attack = attack *2;
+        attack = talent.action_defense(attack, talentLevel);
+            player.setHealthNow(player.getHealthNow() - attack);
         return player;
     }
 
@@ -56,13 +62,4 @@ public class Wolf extends Enemy{
         enemy.setEnergy(enemy.getEnergy() -5);
         return enemy;
     }
-
-    public app.main.GameBot.models.Enemy toModel(Enemy enemy, app.main.GameBot.models.Enemy enemy_model){
-        enemy_model.setAttack(this.attack);
-        enemy_model.setEnergy(this.energy);
-        enemy_model.setHealth(this.health);
-        enemy_model.setDefense(this.defense);
-        return enemy_model;
-    }
-
 }

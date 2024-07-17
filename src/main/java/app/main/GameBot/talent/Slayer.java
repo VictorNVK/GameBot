@@ -60,6 +60,7 @@ public class Slayer extends Talent {
         var energy = 5 * level;
         return "\"Slay: attack +" + damage + ",consumption" + energy + "energy";
     }
+
     public Boolean check_resources(Player player, Integer level){
         var energy = 5;
         if(level >=2 && level % 2 == 0) {

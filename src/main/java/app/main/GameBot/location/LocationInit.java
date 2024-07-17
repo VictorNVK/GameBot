@@ -1,6 +1,7 @@
 package app.main.GameBot.location;
 
 import app.main.GameBot.enemy.Enemy;
+import app.main.GameBot.enemy.Skeleton;
 import app.main.GameBot.enemy.Wolf;
 import app.main.GameBot.models.Item;
 import jakarta.annotation.PostConstruct;
@@ -52,6 +53,10 @@ public class LocationInit {
         stone.setCount(2);
         stone.setItemNameRu("Маленький камень\uD83E\uDEA8");
         stone.setItemNameEn("Little stone\uD83E\uDEA8");
+
+        ArrayList<Enemy> enemies = new ArrayList<>();
+        enemies.add(new Skeleton());
+        suburb.setEnemy(enemies);
 
         var flask = new Item();
         flask.setCount(1);

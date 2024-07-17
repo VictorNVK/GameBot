@@ -65,16 +65,15 @@ public class PlayerHandler {
         sendMessage.setChatId(chatId);
         sendMessage.setText(messager.getCharacteristics() +
                 "\n\n"
-                + messager.getLevel() + player.getLevel() + "\uD83C\uDF1F"
+                + player.getNickname()
+                +"\n" + messager.getLevel() + player.getLevel() + "\uD83C\uDF1F"
                 +"\n"+ messager.getHealth() + player.getHealthNow() + "/" + player.getHealth() + "♥\uFE0F"
         +"\n" +messager.getEnergy() + player.getEnergyNow() + "/" + player.getEnergy() + "⚡\uFE0F"
         +"\n" + messager.getBlood() + player.getBloodNow() + "/" + player.getBlood() + "\uD83E\uDE78"
                 +"\n" + messager.getAttack() + player.getAttack() + "\uD83D\uDDE1"
         +"\n" +messager.getDefense() + player.getDefense() + "\uD83D\uDEE1"
-                        +"\n" +messager.getBarrier() + player.getBarrier() + "\uD83D\uDD35"
-        /*+"\n" + messager.getHealthRegeneration() + player.getHealthRegeneration()
-        +"\n" + messager.getEnergyRegeneration() + player.getEnergyRegeneration()
-        +"\n" + messager.getBloodRegeneration() + player.getBloodRegeneration()*/
+                        +"\n" +messager.getBarrier() + +player.getBarrierNow() + "/" + player.getBarrier() + "\uD83D" +
+                "\uDD35"
         );
 
         sendMessage.setReplyMarkup(playerKeyboard.back_keyboard(lang));
@@ -107,10 +106,7 @@ public class PlayerHandler {
             wayRepository.save(way1);
             sendMessage.setReplyMarkup(playerKeyboard.talents_list(talents, lang, way1));
         }
-
         sendMessage.setText(messager.getChoose_param_of_menu());
-
-
         return sendMessage;
     }
     public SendMessage your_talent_stats(Talent talent, Long chatId, String lang, Player player){
@@ -177,10 +173,11 @@ public class PlayerHandler {
                     }
                     else if(way_name.equals("Word way")){
                         player.setEnergy(player.getEnergy() + 5);
+                        player.setEnergyNow(player.getEnergyNow() + 5);
+                        player.setBarrierNow(player.getBarrierNow() +3);
                         player.setBarrier(player.getBarrier() +3);
                     }
                     playerRepository.save(player);
-                    /*Место для раскачки ветки*/
                 }
         return sendMessage;
     }
@@ -188,7 +185,7 @@ public class PlayerHandler {
         choose_lang(lang);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        way.setLevel(way.getLevel() +1);
+        way.setLevel(way.getLevel() + 1);
         wayRepository.save(way);
         sendMessage.setText(messager.getBranch_is_up() + way.getLevel());
         return sendMessage;
@@ -277,7 +274,14 @@ public class PlayerHandler {
         }
         return sendMessage;
     }
-
+    public SendMessage regeneration_menu(Long chatId, String lang){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getChoose_param_of_menu());
+        sendMessage.setReplyMarkup(playerKeyboard.regeneration_menu(lang));
+        return sendMessage;
+    }
 
     @Transactional
     public SendMessage back_up(Long chatId, String lang, Player player){
@@ -290,6 +294,21 @@ public class PlayerHandler {
         playerRepository.save(player);
         upgradeProgressRepository.delete(upgradeProgress);
         sendMessage.setText(messager.getUp_is_delete());
+        return sendMessage;
+    }
+    public SendMessage regeneration_stop(Long chatId, String lang){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getStop_regeneration());
+        sendMessage.setReplyMarkup(playerKeyboard.stop_regeneration(lang));
+        return sendMessage;
+    }
+    public SendMessage regeneration_was_stopped(Long chatId, String lang){
+        choose_lang(lang);
+        var sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(messager.getRegen_was_stopped());
         return sendMessage;
     }
 
@@ -312,4 +331,5 @@ public class PlayerHandler {
         }
         return null;
     }
+
 }

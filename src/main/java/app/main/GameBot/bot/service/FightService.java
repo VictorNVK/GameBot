@@ -53,20 +53,25 @@ public class FightService {
         if(callback.startsWith("choose_")){
             var talent_name = callback.substring(7);
             Talent talent = searchTalent(talent_name);
-            app.main.GameBot.models.Talent talent1 = talentRepository.findTalentByPlayerAndName(player,
+            app.main.GameBot.models.Talent talentModel = talentRepository.findTalentByPlayerAndName(player,
                     talent.getNameEn());
-            if(talent.check_resources(player, talent1.getLevel())){
-                messages.add(fightHandler.choose_talent(chatId, user.getLanguage(), talent, player));
-                messages.add(fightHandler.use_skill(chatId, user.getLanguage(),player, user, talent));
-                messages.add(fightHandler.enemy_characteristics(chatId, user.getLanguage(), player));
-                if(fightRepository.findByPlayer(player).getEnemy().getHealth() <=0){
-                    messages.add(fightHandler.enemy_dead(chatId, user.getLanguage(), player));
-                    messages.add(menuHandler.menu(chatId, user.getLanguage()));
-                    user.setUserState(UserState.MENU);
-                    userRepository.save(user);
+            if(talentModel != null) {
+                if (talent.check_resources(player, talentModel.getLevel())) {
+                    messages.add(fightHandler.choose_talent(chatId, user.getLanguage(), talent, player));
+                    messages.add(fightHandler.use_skill(chatId, user.getLanguage(), player, user, talent));
+                    messages.add(fightHandler.enemy_characteristics(chatId, user.getLanguage(), player));
+                    if (fightRepository.findByPlayer(player).getEnemy().getHealth() <= 0) {
+                        messages.add(fightHandler.enemy_dead(chatId, user.getLanguage(), player));
+                        messages.add(menuHandler.menu(chatId, user.getLanguage()));
+                        user.setUserState(UserState.MENU);
+                        userRepository.save(user);
+                    }
+                } else {
+                    messages.add(fightHandler.no_resources(chatId, user.getLanguage()));
+                    messages.add(fightHandler.fight_menu(chatId, user.getLanguage()));
                 }
             }else {
-                messages.add(fightHandler.no_resources(chatId, user.getLanguage()));
+                messages.add(fightHandler.talent_not_learned(chatId, user.getLanguage()));
                 messages.add(fightHandler.fight_menu(chatId, user.getLanguage()));
             }
         }

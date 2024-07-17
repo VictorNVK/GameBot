@@ -32,6 +32,11 @@ public class LocationKeyboard extends Keyboard {
         back.setText(messager.getBack());
         back.setCallbackData("back");
         row2.add(back);
+        var regeneration = new InlineKeyboardButton();
+        regeneration.setText(messager.getHealing());
+        regeneration.setCallbackData("regeneration");
+        row2.add(regeneration);
+
         rows.add(row2);
         keyboardMarkup.setKeyboard(rows);
         keyboardMarkup.setKeyboard(rows);

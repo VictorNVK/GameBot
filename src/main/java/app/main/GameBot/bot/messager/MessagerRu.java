@@ -91,5 +91,9 @@ public class MessagerRu extends Messager {
     private final String enemy_stats = "Характеристики врага: ";
     private final String enemy_is_dead = "Враг повержен! Вот награда\n";
     private final String crystal = "кристалл";
+    private final String talent_is_not_learned = "Этот талант не изучен!";
+    private final String healing = "Восстановление\uD83E\uDEE7";
+    private final String stop_regeneration = "Отсановить восстановление\uD83D\uDED1";
+    private final String regen_was_stopped = "Восстановление было остановлено\uD83D\uDED1";
 }
 

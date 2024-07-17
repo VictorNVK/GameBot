@@ -32,7 +32,7 @@ public class GradeTimer {
     private final TalentsInit talentsInit;
 
     @SneakyThrows
-    @Scheduled(fixedRate = 25000)
+    @Scheduled(fixedRate = 15000)
     @Async
     public void start_timer(){
         Date date = new Date();
