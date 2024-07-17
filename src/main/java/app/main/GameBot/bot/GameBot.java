@@ -2,7 +2,6 @@ package app.main.GameBot.bot;
 
 import app.main.GameBot.bot.config.BotConfig;
 import app.main.GameBot.bot.handler.LocationHandler;
-import app.main.GameBot.bot.handler.MenuHandler;
 import app.main.GameBot.bot.handler.PlayerHandler;
 import app.main.GameBot.bot.service.FightService;
 import app.main.GameBot.bot.service.MenuService;
@@ -106,7 +105,6 @@ public class GameBot extends TelegramLongPollingBot {
     @Async
     @SneakyThrows
     protected void callbackHandler(Update update, User user) {
-
         var callback = update.getCallbackQuery().getData();
         var chatId = update.getCallbackQuery().getFrom().getId();
 
