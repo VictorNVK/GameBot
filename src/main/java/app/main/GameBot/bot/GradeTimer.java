@@ -1,17 +1,16 @@
-package app.main.GameBot.talent;
+package app.main.GameBot.bot;
 
-import app.main.GameBot.bot.GameBot;
 import app.main.GameBot.bot.handler.PlayerHandler;
 import app.main.GameBot.models.UpgradeProgress;
 import app.main.GameBot.models.User;
-import app.main.GameBot.repositories.PlayerRepository;
 import app.main.GameBot.repositories.UpgradeProgressRepository;
 import app.main.GameBot.repositories.UserRepository;
 import app.main.GameBot.states.UserState;
+import app.main.GameBot.talent.Talent;
+import app.main.GameBot.talent.TalentsInit;
 import app.main.GameBot.way.Way;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -24,15 +23,14 @@ import java.util.List;
 public class GradeTimer {
 
     private final UpgradeProgressRepository upgradeProgressRepository;
-    private final PlayerRepository playerRepository;
     private final UserRepository userRepository;
     private final PlayerHandler playerHandler;
-    @Autowired
+
     private final GameBot gameBot;
     private final TalentsInit talentsInit;
 
     @SneakyThrows
-    @Scheduled(fixedRate = 15000)
+    @Scheduled(fixedRate = 5000)
     @Async
     public void start_timer(){
         Date date = new Date();

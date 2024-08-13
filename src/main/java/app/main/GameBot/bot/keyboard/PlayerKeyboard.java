@@ -51,6 +51,19 @@ public class PlayerKeyboard extends Keyboard {
         keyboardMarkup.setKeyboard(rows);
         return keyboardMarkup;
     }
+    public InlineKeyboardMarkup back_up_keyboard_up(String lang){
+        choose_lang(lang);
+        var keyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        List<InlineKeyboardButton> row1 = new ArrayList<>();
+        var back = new InlineKeyboardButton();
+        back.setText(messager.getBack());
+        back.setCallbackData("back_up");
+        row1.add(back);
+        rows.add(row1);
+        keyboardMarkup.setKeyboard(rows);
+        return keyboardMarkup;
+    }
     public InlineKeyboardMarkup train_menu(String lang){
         choose_lang(lang);
 
@@ -59,7 +72,7 @@ public class PlayerKeyboard extends Keyboard {
 
         List<InlineKeyboardButton> row1 = new ArrayList<>();
         var button1 = new InlineKeyboardButton();
-        button1.setText(messager.getTalents());
+        button1.setText(messager.getSkills());
         button1.setCallbackData("talents_up");
         row1.add(button1);
         var button2 = new InlineKeyboardButton();

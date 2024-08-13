@@ -22,32 +22,40 @@ public class Suppression extends Talent{
     }
 
     public Integer action_defense(Integer damage, Integer level){
-        var block = 20 + level * 5;
+        var block = 20 + (level-1) * 5;
         damage =  damage - (block * (damage/100));
         return damage ;
     }
     public String descriptionRu(app.main.GameBot.models.Talent talent){
         var level = talent.getLevel();
-        var block = 20 + level * 5;
-        var energy =  level * 5;
+        var block = 20 + (level-1) * 5;
+        var energy =  (level) * 5;
 
+        if(level == 0){
+            block= 0;
+            energy = 0;
+        }
         return "Поглощение урона - " + block + "%" + "|" + "Расход энергии - " + energy;
     }
     public String descriptionEn(app.main.GameBot.models.Talent talent){
         var level = talent.getLevel();
-        var block = 20 + level * 5;
-        var energy =  level * 5;
+        var block = 20 + (level-1) * 5;
+        var energy =  (level) * 5;
+        if(level == 0){
+            block= 0;
+            energy = 0;
+        }
         return "Suppression damage - " + block + "%" + "|" + "Energy consumption - " + energy;
     }
     public Boolean check_resources(Player player, Integer level){
-        var energy = level * 5;
+        var energy = (level) * 5;
         if(player.getEnergyNow() >= energy){
             return true;
         }
         return false;
     }
     public Player action_price(Player player, app.main.GameBot.models.Talent talent){
-        var energy = talent.getLevel() * 5;
+        var energy = (talent.getLevel() -1) * 5;
         player.setEnergyNow(player.getEnergyNow() - energy);
         return player;
     }

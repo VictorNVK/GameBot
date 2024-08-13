@@ -80,7 +80,7 @@ public class MenuService {
             return messages;
 
         }
-        if(callback.startsWith("back") && user.getUserState().equals(UserState.GRADE)){
+        if(callback.startsWith("back_up") && user.getUserState().equals(UserState.GRADE)){
             messages.add(playerHandler.back_up(chatId, user.getLanguage() , player));
             messages.add(playerHandler.your_balance(chatId, user.getLanguage(), player.getCrystals()));
             user.setUserState(UserState.MENU);

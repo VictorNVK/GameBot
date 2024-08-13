@@ -34,6 +34,10 @@ public class WeakBarrier extends Talent {
         var level = talent.getLevel();
         var block = 5 + level * 3;
         var energy = 10 + level * 3;
+        if(level == 0){
+            block= 0;
+            energy = 0;
+        }
         return "Блок урона - " + block + "|" + "Расход энергии - " + energy;
 
     }
@@ -42,6 +46,10 @@ public class WeakBarrier extends Talent {
         var level = talent.getLevel();
         var block = 5 + level * 3;
         var energy = 10 + level * 3;
+        if(level == 0){
+            block= 0;
+            energy = 0;
+        }
         return "Damage block - " + block + "|" + "Energy consumption - " + energy;
     }
 

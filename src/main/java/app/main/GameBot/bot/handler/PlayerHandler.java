@@ -13,12 +13,12 @@ import app.main.GameBot.talent.Talent;
 import app.main.GameBot.way.Way;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -34,6 +34,13 @@ public class PlayerHandler {
     private final UserRepository userRepository;
     private final WayRepository wayRepository;
 
+
+    @Value("${price.branch.up}")
+    private Integer branch_up_price;
+
+    @Value("${price.skill.up}")
+    private Integer skill_up_price;
+
     private void choose_lang(String lang) {
         if (lang.startsWith("rus")) {
             messager = new MessagerRu();
@@ -41,6 +48,8 @@ public class PlayerHandler {
             messager = new MessagerEn();
         }
     }
+
+
 
     public Player create_player(String name, User user){
         var player = new Player();
@@ -201,9 +210,9 @@ public class PlayerHandler {
             sendMessage.setText(messager.getTalent_is_maxed());
             return sendMessage;
         }
-        var crystal_count = 15;
+        var crystal_count = skill_up_price;
         for(int i = 0; i< talent.getLevel(); i++){
-            crystal_count = crystal_count +15;
+            crystal_count = crystal_count + skill_up_price;
         }
         var time = crystal_count * 5;
 
@@ -214,7 +223,7 @@ public class PlayerHandler {
             upgradeProgress.setTalent(talent);
 
             Date date = new Date();
-            var newDate = date.getTime() + TimeUnit.SECONDS.toMillis(time);
+            var newDate = date.getTime();
             var up_time = new Date(newDate);
             upgradeProgress.setTime(up_time);
             upgradeProgress.setPrice(crystal_count);
@@ -222,7 +231,7 @@ public class PlayerHandler {
             upgradeProgressRepository.save(upgradeProgress);
             sendMessage.setText(messager.getUp_time() + time + " " + messager.getSecond() + " , " + messager.getAwait_up());
             playerRepository.save(player);
-            sendMessage.setReplyMarkup(playerKeyboard.back_keyboard(lang));
+            sendMessage.setReplyMarkup(playerKeyboard.back_up_keyboard_up(lang));
             user.setUserState(UserState.GRADE);
             userRepository.save(user);
         }else {
@@ -245,7 +254,7 @@ public class PlayerHandler {
             sendMessage.setText(messager.getLevel_is_maxed_for_branch());
             return sendMessage;
         }
-        var crystal_count = 25;
+        var crystal_count = branch_up_price;
         for(int i = 0; i< branch.getLevel(); i++){
             crystal_count = (int) Math.ceil(crystal_count * 1.5);
         }
@@ -258,7 +267,7 @@ public class PlayerHandler {
             upgradeProgress.setWay(branch);
 
             Date date = new Date();
-            var newDate = date.getTime() + TimeUnit.SECONDS.toMillis(time);
+            var newDate = date.getTime();
             var up_time = new Date(newDate);
             upgradeProgress.setTime(up_time);
             upgradeProgress.setPrice(crystal_count);
@@ -266,7 +275,7 @@ public class PlayerHandler {
             upgradeProgressRepository.save(upgradeProgress);
             sendMessage.setText(messager.getUp_time_branch() + time + " " + messager.getSecond() + " , " + messager.getAwait_up());
             playerRepository.save(player);
-            sendMessage.setReplyMarkup(playerKeyboard.back_keyboard(lang));
+            sendMessage.setReplyMarkup(playerKeyboard.back_up_keyboard_up(lang));
             user.setUserState(UserState.GRADE);
             userRepository.save(user);
         }else {
@@ -286,13 +295,13 @@ public class PlayerHandler {
     @Transactional
     public SendMessage back_up(Long chatId, String lang, Player player){
         choose_lang(lang);
+        UpgradeProgress upgradeProgress = upgradeProgressRepository.findUpgradeProgressByPlayer(player);
+        upgradeProgressRepository.delete(upgradeProgress);
         var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        UpgradeProgress upgradeProgress = upgradeProgressRepository.findUpgradeProgressByPlayer(player);
         var price = upgradeProgress.getPrice();
         player.setCrystals(player.getCrystals() + price);
         playerRepository.save(player);
-        upgradeProgressRepository.delete(upgradeProgress);
         sendMessage.setText(messager.getUp_is_delete());
         return sendMessage;
     }

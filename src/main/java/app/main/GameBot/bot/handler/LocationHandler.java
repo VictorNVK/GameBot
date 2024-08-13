@@ -4,7 +4,6 @@ import app.main.GameBot.bot.keyboard.LocationKeyboard;
 import app.main.GameBot.bot.messager.Messager;
 import app.main.GameBot.bot.messager.MessagerEn;
 import app.main.GameBot.bot.messager.MessagerRu;
-import app.main.GameBot.bot.service.FightService;
 import app.main.GameBot.location.LocationInit;
 import app.main.GameBot.models.Item;
 import app.main.GameBot.models.Player;

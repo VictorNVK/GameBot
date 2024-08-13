@@ -41,9 +41,9 @@ public class Dodger extends Talent {
         var miss = 2 * level;
         var energy = 2;
         if (level >= 2 && level % 2 == 0) {
-            energy = energy + level / 2;
+            energy = (energy + level-1) / 2;
         } else {
-            energy = energy + level / 2;
+            energy = (energy + level-1) / 2;
         }
         return "Шанс уворота: " + miss + "%\uD83D\uDCA8" + " " + " Расход энергии " + energy + "⚡\uFE0F" +
                 "\n + Нельзя выключить до конца боя или пока не кончится энергия!";
@@ -55,9 +55,9 @@ public class Dodger extends Talent {
         var miss = 2 * level;
         var energy = 2;
         if (level >= 2 && level % 2 == 0) {
-            energy = energy + level / 2;
+            energy = (energy + level-1) / 2;
         } else {
-            energy = energy + level / 2;
+            energy = (energy + level-1) / 2;
         }
         return "Dodge chance: " + miss + "%\uD83D\uDCA8" + " " + " Energy consumption " + energy + "⚡\uFE0F" +
                 "\n + Cannot be turned off until the end of the battle or until the energy runs out!";
@@ -66,9 +66,9 @@ public class Dodger extends Talent {
     public Boolean check_resources(Player player, Integer level) {
         var energy = 2;
         if (level >= 2 && level % 2 == 0) {
-            energy = energy + level / 2;
+            energy = (energy + level-1) / 2;
         } else {
-            energy = energy + level / 2;
+            energy = (energy + level-1) / 2;
         }
         if (player.getEnergyNow() >= energy) {
             return true;
@@ -79,9 +79,9 @@ public class Dodger extends Talent {
         var level = talent.getLevel();
         var energy = 2;
         if (level >= 2 && level % 2 == 0) {
-            energy = energy + level / 2;
+            energy = (energy + level-1) / 2;
         } else {
-            energy = energy + level / 2;
+            energy = (energy + level-1) / 2;
         }
         player.setEnergyNow(player.getEnergyNow() - energy);
         return player;

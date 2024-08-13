@@ -22,7 +22,7 @@ public class Slayer extends Talent {
     public app.main.GameBot.models.Enemy action_attack(Enemy enemy, Player player, app.main.GameBot.models.Talent talent){
         var enemyDefense = enemy.getDefense();
         var level = talent.getLevel();
-        var damage = 2 + (level * 1);
+        var damage = 2 + (level - 1);
         var attack = player.getAttack() + damage - enemyDefense;
         enemy.setHealth(enemy.getHealth() - attack);
         return enemy;
@@ -35,9 +35,9 @@ public class Slayer extends Talent {
         var level = talent.getLevel();
         var energy = 5;
         if(level >=2 && level % 2 == 0) {
-            energy = energy + level /2;
+            energy = (energy + level-1) /2;
         }else {
-            energy = energy + level/2;
+            energy = (energy + level-1) /2;
         }
         player.setEnergyNow(player.getEnergyNow() - energy);
         return player;
@@ -45,28 +45,42 @@ public class Slayer extends Talent {
 
     public String descriptionRu(app.main.GameBot.models.Talent talent){
         var level = talent.getLevel();
-        var damage = 2 + (level * 1);
+
+        var damage = 2 + (level - 1 * 1);
         var energy = 5;
         if(level >=2 && level % 2 == 0) {
-            energy = energy + level /2;
+            energy = (energy + level-1) /2;
         }else {
-            energy = energy + level/2;
+            energy = (energy + level-1) /2;
+        }
+        if(level == 0){
+            damage = 0;
+            energy = 0;
         }
         return "Разрез: атака +"+ damage + ", расход " + energy + " энергии⚡\uFE0F";
     }
     public String descriptionEn(app.main.GameBot.models.Talent talent){
         var level = talent.getLevel();
-        var damage = level * 2;
-        var energy = 5 * level;
+        var damage = 2 + (level - 1 * 1);
+        var energy = 5;
+        if(level >=2 && level % 2 == 0) {
+            energy = (energy + level-1) /2;
+        }else {
+            energy = (energy + level-1) /2;
+        }
+        if(level == 0){
+            damage = 0;
+            energy = 0;
+        }
         return "\"Slay: attack +" + damage + ",consumption" + energy + "energy";
     }
 
     public Boolean check_resources(Player player, Integer level){
         var energy = 5;
         if(level >=2 && level % 2 == 0) {
-            energy = energy + level /2;
+            energy = (energy + level-1) /2;
         }else {
-            energy = energy + level/2;
+            energy = (energy + level-1) /2;
         }
         if(player.getEnergyNow() >= energy) {
             return true;

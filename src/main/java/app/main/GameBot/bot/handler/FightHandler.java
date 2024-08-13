@@ -25,7 +25,6 @@ import java.util.Random;
 public class FightHandler {
 
     private final UserRepository userRepository;
-    private final MenuKeyboard menuKeyboard;
     private final LocationKeyboard locationKeyboard;
     private final WayRepository wayRepository;
     private final TalentsInit talentsInit;
